@@ -236,6 +236,115 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 .fs14{font-size:14px;}
 .fs13{font-size:13px;}
 .fs12{font-size:12px;}
+
+/* ============ MOBILE — iPhone 13/14/15 (≤600px) ============ */
+@media (max-width: 600px) {
+  /* Top nav */
+  .topnav { padding: 8px 12px; }
+  .topnav .nav-logo { font-size: 14px; gap: 6px; }
+  .topnav .nav-logo svg { width: 18px; height: 18px; }
+  .nav-btn { padding: 5px 10px; font-size: 11px; }
+  .slide-counter { font-size: 11px; padding: 0 6px; }
+
+  /* Slides offset for smaller nav */
+  .slides-wrap { top: 48px; bottom: 48px; }
+  .progress-bar-wrap { top: 48px; }
+
+  /* Slide header */
+  .slide-hdr { padding: 10px 14px 9px; gap: 8px; }
+  .slide-hdr .s-tag { font-size: 9px; padding: 3px 8px; }
+  .slide-hdr .s-title { font-size: 15px; }
+  .slide-hdr .s-num { font-size: 10px; padding: 2px 8px; }
+
+  /* Slide body */
+  .slide-body { padding: 14px 14px 12px; }
+
+  /* Grids collapse to 1 col */
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Stats */
+  .stat-card { padding: 14px; border-radius: 12px; }
+  .stat-n { font-size: 24px; }
+  .stat-l { font-size: 11px; }
+
+  /* Section title */
+  .section-title { font-size: 17px; }
+
+  /* Cards */
+  .card { padding: 12px; border-radius: 12px; }
+  .card-navy { padding: 12px; border-radius: 12px; }
+
+  /* Bullet list */
+  .bullet-list li { font-size: 13px; }
+
+  /* Persona layout */
+  .persona-wrap { grid-template-columns: 1fr; gap: 12px; }
+  .persona-left { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .persona-avatar { width: 56px; height: 56px; font-size: 22px; }
+  .persona-name { font-size: 17px; }
+  .persona-quote { font-size: 12px; }
+
+  /* IPA chart */
+  .ipa-wrap { grid-template-columns: 1fr; gap: 12px; }
+  .ipa-img { min-height: 200px; }
+
+  /* Image pair */
+  .img-pair { grid-template-columns: 1fr; gap: 12px; height: auto; }
+  .img-frame { min-height: 160px; padding: 8px; }
+
+  /* Competitor table: make scrollable */
+  .comp-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .comp-table th, .comp-table td { padding: 8px 10px; font-size: 11px; }
+
+  /* Attributes */
+  .attr-label { font-size: 12px; }
+  .attr-bar-wrap { width: 90px; }
+  .attr-num { width: 22px; height: 22px; font-size: 10px; }
+
+  /* T&C grid */
+  .tc-grid { grid-template-columns: 1fr; gap: 10px; }
+  .tc-card .tc-title { font-size: 13px; }
+  .tc-card .tc-text { font-size: 11px; }
+
+  /* Loyalty rows */
+  .loyalty-title { font-size: 13px; }
+  .loyalty-desc { font-size: 11px; }
+  .loyalty-icon { font-size: 20px; }
+
+  /* Journey */
+  .j-ch-name { font-size: 12px; }
+  .j-row { font-size: 10px; }
+
+  /* Bottom nav */
+  .bottom-nav { padding: 6px 10px; }
+  .nav-arrow { padding: 6px 14px; font-size: 12px; gap: 4px; }
+  .nav-dots { gap: 4px; max-width: 180px; }
+  .ndot { width: 5px; height: 5px; }
+  .ndot.active { transform: scale(1.5); }
+
+  /* Slide 1 title screen */
+  .slide-1-title { font-size: 32px !important; letter-spacing: -1px !important; }
+  .slide-1-logo { width: 64px !important; height: 64px !important; margin-bottom: 16px !important; }
+  .slide-1-logo-svg { width: 38px !important; height: 38px !important; }
+  .slide-1-subtitle { font-size: 13px !important; }
+  .slide-1-meta { font-size: 12px !important; margin-bottom: 20px !important; }
+  .slide-1-tag { padding: 6px 12px !important; font-size: 11px !important; }
+
+  /* Font helpers override */
+  .fs14 { font-size: 13px; }
+  .fs13 { font-size: 12px; }
+  .fs12 { font-size: 11px; }
+}
+
+/* ============ SMALL PHONES (≤390px — iPhone 13 exact) ============ */
+@media (max-width: 390px) {
+  .slide-hdr .s-title { font-size: 14px; }
+  .stat-n { font-size: 22px; }
+  .nav-arrow { padding: 5px 10px; font-size: 11px; }
+  .slide-body { padding: 10px 12px 10px; }
+  .nav-dots { max-width: 140px; }
+  .ndot { width: 4px; height: 4px; }
+}
 </style>
 </head>
 <body>
@@ -267,8 +376,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
     <!-- BG pattern -->
     <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(14,165,233,0.15),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(99,102,241,0.12),transparent 60%);pointer-events:none;"></div>
     <!-- Logo -->
-    <div style="width:90px;height:90px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;backdrop-filter:blur(8px);">
-      <svg width="56" height="56" viewBox="0 0 100 100" fill="none">
+    <div class="slide-1-logo" style="width:90px;height:90px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;backdrop-filter:blur(8px);">
+      <svg class="slide-1-logo-svg" width="56" height="56" viewBox="0 0 100 100" fill="none">
         <path d="M16 60 L24 40 L76 40 L84 60 L84 70 L16 70Z" fill="white"/>
         <path d="M26 40 L32 24 L68 24 L74 40" fill="white"/>
         <circle cx="28" cy="70" r="8" fill="#0EA5E9"/>
@@ -279,16 +388,16 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
         <path d="M64 16 Q72 8 80 16" stroke="#0EA5E9" fill="none" stroke-width="2.5" stroke-linecap="round"/>
       </svg>
     </div>
-    <div style="font-size:56px;font-weight:900;color:white;letter-spacing:-2px;margin-bottom:8px;">UniRide <span style="color:#0EA5E9;">App</span></div>
-    <div style="font-size:17px;color:rgba(255,255,255,0.65);margin-bottom:4px;font-weight:500;">Consumer Information & Decision Channel Mapping</div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:36px;">CIDCM Milestone 3 &nbsp;·&nbsp; Team 5/6 .08 &nbsp;·&nbsp; April 29, 2026</div>
+    <div class="slide-1-title" style="font-size:56px;font-weight:900;color:white;letter-spacing:-2px;margin-bottom:8px;">UniRide <span style="color:#0EA5E9;">App</span></div>
+    <div class="slide-1-subtitle" style="font-size:17px;color:rgba(255,255,255,0.65);margin-bottom:4px;font-weight:500;">Consumer Information & Decision Channel Mapping</div>
+    <div class="slide-1-meta" style="font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:36px;">CIDCM Milestone 3 &nbsp;·&nbsp; Team 5/6 .08 &nbsp;·&nbsp; April 29, 2026</div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:580px;">
-      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Olimpia Lorenzetti</span>
-      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Anna Wong</span>
-      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Marina White</span>
-      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Rasha</span>
-      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Ilya Itin</span>
-      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Ilana Gonzalez</span>
+      <span class="slide-1-tag" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Olimpia Lorenzetti</span>
+      <span class="slide-1-tag" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Anna Wong</span>
+      <span class="slide-1-tag" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Marina White</span>
+      <span class="slide-1-tag" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Rasha</span>
+      <span class="slide-1-tag" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Ilya Itin</span>
+      <span class="slide-1-tag" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Ilana Gonzalez</span>
     </div>
   </div>
 </div>
@@ -385,6 +494,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
     <div class="s-num">4 / 24</div>
   </div>
   <div class="slide-body">
+    <div class="comp-table-wrap">
     <table class="comp-table" style="margin-bottom:16px;">
       <thead>
         <tr>
@@ -405,6 +515,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
         <tr><td>Loyalty Program</td><td><span class="xmark">✗ No</span></td><td>⚡ Basic</td><td>⚡ GA/HTA</td><td><span class="chk" style="color:#059669;">✓ UniPoints</span></td></tr>
       </tbody>
     </table>
+    </div><!-- /comp-table-wrap -->
     <div class="grid-3">
       <div class="card" style="border-top:3px solid var(--sky);">
         <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚗 BlaBlaCar</div>
