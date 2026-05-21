@@ -58,10 +58,10 @@
     // ============== SCREEN NAVIGATION ==============
     const allScreens = Array.from(document.querySelectorAll('.screen'));
     // Put Welcome(12), Sign Up(13), Profile Setup(14) first, then app screens 0-11, then Passenger Survey(15+)
-    const screens = [...allScreens.slice(12, 15), ...allScreens.slice(0, 12), ...allScreens.slice(15)];
+    const screens = [...allScreens.slice(12, 15), ...allScreens.slice(0, 4), allScreens[5], allScreens[4], ...allScreens.slice(6, 12), ...allScreens.slice(15)];
     let currentScreen = 0;
 
-    const screenNames = ['👋 Welcome','📝 Sign Up','✅ Profile Setup','🏠 Home','🔍 Search','🚗 Trip','⭐ Rewards','🏆 Driver','🎁 Redeem','📋 Driver Survey','➕ Offer','💬 Chat','🗺️ Live','⭐ Review','👤 Profile','📋 Passenger Survey'];
+    const screenNames = ['👋 Welcome','📝 Sign Up','✅ Profile Setup','🏠 Home','🔍 Search','🚗 Trip','⭐ Rewards','� Redeem','🏆 Driver','📋 Driver Survey','➕ Offer','💬 Chat','🗺️ Live','⭐ Review','👤 Profile','📋 Passenger Survey'];
     const TOTAL = screens.length;
 
     // Build dots
@@ -91,7 +91,7 @@
       updateNav();
       // Trigger animations on enter
       if (idx === 6) animatePassengerRing();
-      if (idx === 7) animateDriverDashboard();
+      if (idx === 8) animateDriverDashboard();
     }
 
     function prevScreen() { if (currentScreen > 0) goScreen(currentScreen - 1); }
