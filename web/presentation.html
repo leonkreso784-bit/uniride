@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniRide — CIDCM Milestone 3 Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#1E3A5F; --navy2:#1B3358; --sky:#0EA5E9; --blue:#2563EB;
+  --indigo:#6366F1; --white:#FFFFFF; --bg:#F8FBFF; --border:#E2EAF4;
+  --lsky:#E0F2FE; --lb:#DBEAFE; --lind:#E0E7FF;
+  --muted:#64748B; --text:#0F172A; --gold:#F59E0B; --green:#10B981;
+}
+html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:#0f172a;}
+
+/* ============ TOP NAV ============ */
+.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 24px;
+  background:rgba(15,32,64,0.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.topnav .nav-logo{display:flex;align-items:center;gap:8px;color:white;font-weight:800;font-size:16px;text-decoration:none;}
+.topnav .nav-links{display:flex;gap:8px;align-items:center;}
+.nav-btn{padding:6px 14px;border-radius:30px;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.2s;cursor:pointer;border:none;}
+.nav-btn.home{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.2);}
+.nav-btn.app{background:var(--sky);color:white;}
+.nav-btn:hover{transform:translateY(-1px);filter:brightness(1.1);}
+.slide-counter{color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;padding:0 12px;}
+
+/* ============ PROGRESS BAR ============ */
+.progress-bar-wrap{position:fixed;top:50px;left:0;right:0;z-index:190;height:3px;background:rgba(255,255,255,0.1);}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--blue));transition:width 0.5s;}
+
+/* ============ SLIDE CONTAINER ============ */
+.slides-wrap{position:fixed;top:53px;left:0;right:0;bottom:52px;}
+.slide{
+  position:absolute;inset:0;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.45s cubic-bezier(0.4,0,0.2,1),transform 0.45s cubic-bezier(0.4,0,0.2,1);
+  transform:translateX(64px) scale(0.98);
+  overflow:hidden;
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0) scale(1);}
+.slide.exit-left{opacity:0;transform:translateX(-64px) scale(0.98);}
+
+/* Subtle dot grid on all light slides */
+.slide:not(.dark-slide){
+  background: var(--bg);
+  background-image: radial-gradient(circle, #CBD5EA 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: 14px 14px;
+}
+
+/* ============ SLIDE HEADER ============ */
+.slide-hdr{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 32px 12px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  background:white;
+  position:relative;
+  box-shadow: 0 1px 0 var(--border), 0 2px 8px rgba(0,0,0,0.04);
+}
+.slide-hdr::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--sky),var(--blue));
+  border-radius:0 4px 4px 0;
+}
+.slide-hdr .s-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--lsky),var(--lb));
+  color:var(--navy);
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;
+  border:1px solid rgba(14,165,233,0.2);
+}
+.slide-hdr .s-title{font-size:20px;font-weight:900;color:var(--navy);flex:1;line-height:1.2;}
+.slide-hdr .s-num{
+  color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap;
+  background:var(--bg);padding:3px 10px;border-radius:20px;
+  border:1px solid var(--border);
+}
+
+/* Dark header variant */
+.slide.dark-slide{background:var(--navy2);}
+.slide.dark-slide .slide-hdr{background:rgba(0,0,0,0.25);border-color:rgba(255,255,255,0.08);box-shadow:none;}
+.slide.dark-slide .slide-hdr::before{background:linear-gradient(180deg,var(--sky),var(--indigo));}
+.slide.dark-slide .slide-hdr .s-tag{background:rgba(14,165,233,0.15);color:rgba(255,255,255,0.85);border-color:rgba(14,165,233,0.3);}
+.slide.dark-slide .slide-hdr .s-title{color:white;}
+.slide.dark-slide .slide-hdr .s-num{color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);}
+
+/* ============ SLIDE BODY ============ */
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 32px 16px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.slide-body::-webkit-scrollbar{width:5px;}
+.slide-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.slide-body::-webkit-scrollbar-track{background:transparent;}
+
+/* ============ BOTTOM NAV ============ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 24px;
+  background:rgba(10,20,48,0.92);backdrop-filter:blur(16px);
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.nav-arrow{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:white;padding:8px 22px;border-radius:30px;
+  font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;
+  user-select:none;letter-spacing:0.3px;
+}
+.nav-arrow:hover{background:linear-gradient(135deg,var(--sky),var(--blue));border-color:transparent;box-shadow:0 4px 16px rgba(14,165,233,0.35);}
+.nav-arrow:disabled{opacity:0.25;cursor:default;}
+.nav-dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:420px;}
+.ndot{
+  width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.2);
+  cursor:pointer;transition:all 0.25s;flex-shrink:0;
+}
+.ndot.active{background:var(--sky);transform:scale(1.4);box-shadow:0 0 6px rgba(14,165,233,0.6);}
+.ndot:hover{background:rgba(255,255,255,0.55);}
+
+/* ============ COMMON COMPONENTS ============ */
+.card{
+  background:white;border-radius:16px;padding:16px;
+  box-shadow:0 2px 12px rgba(30,58,95,0.07),0 0 0 1px rgba(30,58,95,0.04);
+  transition:box-shadow 0.2s;
+}
+.card:hover{box-shadow:0 4px 20px rgba(30,58,95,0.12),0 0 0 1px rgba(14,165,233,0.1);}
+.card-navy{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:16px;padding:16px;color:white;box-shadow:0 4px 16px rgba(30,58,95,0.25);}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.tag-sky{background:var(--lsky);color:var(--navy);}
+.tag-blue{background:var(--lb);color:#1E40AF;}
+.tag-ind{background:var(--lind);color:#4338CA;}
+.badge-chk{background:#D1FAE5;color:#065F46;}
+.badge-x{background:#FEE2E2;color:#991B1B;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat-card{
+  background:white;border-radius:16px;padding:20px;text-align:center;
+  box-shadow:0 2px 12px rgba(30,58,95,0.07),0 0 0 1px rgba(30,58,95,0.04);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(14,165,233,0.15);}
+.stat-n{font-size:32px;font-weight:900;color:var(--navy);line-height:1;}
+.stat-l{font-size:12px;color:var(--muted);margin-top:4px;}
+.bullet-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.bullet-list li{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--text);line-height:1.5;}
+.bullet-list li::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--sky);flex-shrink:0;margin-top:5px;}
+.section-title{font-size:22px;font-weight:900;color:var(--navy);margin-bottom:12px;}
+.divider{height:1px;background:var(--border);margin:12px 0;}
+/* Journey */
+.j-grid{display:grid;gap:12px;}
+.j-phase{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.j-phase-hdr{padding:10px 16px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:white;}
+.j-ph-awareness{background:var(--sky);}
+.j-ph-search{background:var(--navy);}
+.j-ph-eval{background:var(--blue);}
+.j-ph-purchase{background:#059669;}
+.j-ph-postpurchase{background:#7C3AED;}
+.j-channels{padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+.j-ch{background:var(--bg);border-radius:10px;padding:10px 12px;}
+.j-ch-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.j-row{display:flex;gap:6px;font-size:11px;line-height:1.4;margin-bottom:3px;}
+.j-label{font-weight:700;color:var(--muted);min-width:38px;flex-shrink:0;}
+.j-val{color:var(--text);}
+/* Persona */
+.persona-wrap{display:grid;grid-template-columns:220px 1fr;gap:20px;height:100%;}
+.persona-left{display:flex;flex-direction:column;gap:12px;}
+.persona-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--blue));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:white;}
+.persona-name{font-size:22px;font-weight:900;color:var(--navy);}
+.persona-role{display:inline-flex;align-items:center;gap:6px;background:var(--lb);color:#1E40AF;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+.persona-stat{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--text);}
+.persona-stat span:first-child{font-weight:700;color:var(--navy);}
+.persona-quote{background:var(--navy);color:white;border-radius:12px;padding:14px;font-size:13px;font-style:italic;line-height:1.6;position:relative;}
+.persona-quote::before{content:'"';font-size:36px;color:var(--sky);line-height:0.5;position:absolute;top:16px;left:12px;}
+.persona-quote p{padding-left:20px;}
+/* IPA chart */
+.ipa-wrap{display:grid;grid-template-columns:1fr 320px;gap:16px;height:100%;}
+.ipa-img{background:var(--bg);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.ipa-img img{max-width:100%;max-height:100%;object-fit:contain;}
+/* Image slide */
+.img-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%;}
+.img-frame{
+  background:linear-gradient(135deg,var(--lb),var(--lsky));
+  border-radius:18px;
+  border:1.5px solid rgba(14,165,233,0.25);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;padding:10px;
+  box-shadow:0 4px 20px rgba(37,99,235,0.12),0 0 0 1px rgba(14,165,233,0.08);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.img-frame:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(37,99,235,0.18),0 0 0 1.5px rgba(14,165,233,0.2);}
+.img-frame img{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+/* Competitor table */
+.comp-table{width:100%;border-collapse:separate;border-spacing:0;}
+.comp-table th{background:var(--navy);color:white;padding:12px 16px;font-size:13px;font-weight:700;text-align:left;}
+.comp-table th:first-child{border-radius:12px 0 0 0;}
+.comp-table th:last-child{border-radius:0 12px 0 0;}
+.comp-table td{padding:11px 16px;font-size:13px;border-bottom:1px solid var(--border);background:white;}
+.comp-table tr:hover td{background:var(--bg);}
+.comp-table td:first-child{font-weight:700;color:var(--navy);}
+.chk{color:#10B981;font-weight:700;font-size:15px;}
+.xmark{color:#EF4444;font-weight:700;font-size:15px;}
+/* 7 attributes */
+.attr-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.attr-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.attr-label{font-size:14px;font-weight:600;color:var(--text);flex:1;}
+.attr-bar-wrap{width:160px;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.attr-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--sky),var(--blue));}
+/* T&C */
+.tc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.tc-card{background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.tc-card .tc-icon{font-size:24px;margin-bottom:8px;}
+.tc-card .tc-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.tc-card .tc-text{font-size:12px;color:var(--muted);line-height:1.6;}
+/* Loyalty */
+.loyalty-row{display:flex;align-items:flex-start;gap:12px;padding:12px;background:white;border-radius:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.loyalty-icon{font-size:24px;flex-shrink:0;}
+.loyalty-title{font-size:14px;font-weight:700;color:var(--navy);}
+.loyalty-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.loyalty-pts{background:var(--navy);color:white;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-left:auto;flex-shrink:0;align-self:flex-start;}
+/* dark text helpers */
+.text-white{color:white;}
+.text-muted-light{color:rgba(255,255,255,0.65);}
+.fw900{font-weight:900;}
+.fs14{font-size:14px;}
+.fs13{font-size:13px;}
+.fs12{font-size:12px;}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="index.html" class="nav-logo">
+    <svg width="22" height="22" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="20" fill="#1E3A5F"/><path d="M18 60 L25 44 L75 44 L82 60 L82 68 L18 68Z" fill="white"/><circle cx="30" cy="68" r="7" fill="#0EA5E9"/><circle cx="70" cy="68" r="7" fill="#0EA5E9"/></svg>
+    UniRide
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-btn home">🏠 Home</a>
+    <a href="app.html" class="nav-btn app">📱 App</a>
+    <span class="slide-counter" id="slide-counter">1 / 24</span>
+  </div>
+</nav>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progress-fill" style="width:4.2%;"></div>
+</div>
+
+<!-- SLIDES CONTAINER -->
+<div class="slides-wrap" id="slides-wrap">
+
+<!-- ===================== SLIDE 1: TITLE ===================== -->
+<div class="slide dark-slide active" id="slide-1">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;position:relative;overflow:hidden;">
+    <!-- BG pattern -->
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(14,165,233,0.15),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(99,102,241,0.12),transparent 60%);pointer-events:none;"></div>
+    <!-- Logo -->
+    <div style="width:90px;height:90px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;backdrop-filter:blur(8px);">
+      <svg width="56" height="56" viewBox="0 0 100 100" fill="none">
+        <path d="M16 60 L24 40 L76 40 L84 60 L84 70 L16 70Z" fill="white"/>
+        <path d="M26 40 L32 24 L68 24 L74 40" fill="white"/>
+        <circle cx="28" cy="70" r="8" fill="#0EA5E9"/>
+        <circle cx="72" cy="70" r="8" fill="#0EA5E9"/>
+        <path d="M33 40 L37 26 L63 26 L67 40Z" fill="#1E3A5F"/>
+        <circle cx="50" cy="16" r="4" fill="#0EA5E9"/>
+        <path d="M36 16 Q28 8 20 16" stroke="#0EA5E9" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M64 16 Q72 8 80 16" stroke="#0EA5E9" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div style="font-size:56px;font-weight:900;color:white;letter-spacing:-2px;margin-bottom:8px;">UniRide <span style="color:#0EA5E9;">App</span></div>
+    <div style="font-size:17px;color:rgba(255,255,255,0.65);margin-bottom:4px;font-weight:500;">Consumer Information & Decision Channel Mapping</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:36px;">CIDCM Milestone 3 &nbsp;·&nbsp; Team 5/6 .08 &nbsp;·&nbsp; April 29, 2026</div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:580px;">
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Olimpia Lorenzetti</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Anna Wong</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Marina White</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Rasha</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Ilya Itin</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;">Ilana Gonzalez</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 2: INTRODUCTION ===================== -->
+<div class="slide" id="slide-2">
+  <div class="slide-hdr">
+    <span class="s-tag">Overview</span>
+    <div class="s-title">Introduction</div>
+    <div class="s-num">2 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2" style="height:100%;">
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div style="font-size:16px;font-weight:900;color:var(--navy);margin-bottom:12px;">🚗 What is UniRide?</div>
+          <ul class="bullet-list">
+            <li>Student-to-student <strong>ridesharing platform</strong> designed for Switzerland</li>
+            <li>Connects university students as drivers and passengers for intercity trips</li>
+            <li>Focus: <strong>budget-friendly</strong>, safe & campus-connected travel</li>
+            <li>Provides affordable cross-border trips — CH → Italy, France, Germany</li>
+            <li>Launched to fill a <strong>gap in the Swiss market</strong> where BlaBlaCar is absent</li>
+          </ul>
+        </div>
+        <div class="card-navy">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;">💬 Core Value Proposition</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6;">"Share your journey, split the cost — meet fellow students along the way."</div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div style="font-size:16px;font-weight:900;color:var(--navy);margin-bottom:12px;">🇨🇭 Market Context</div>
+          <ul class="bullet-list">
+            <li>Switzerland: <strong>8.7 million</strong> population, ~30% are university students or young adults</li>
+            <li>SBB (Swiss Rail) fares among <strong>highest in Europe</strong> — driving demand for alternatives</li>
+            <li>BlaBlaCar does <strong>not operate in Switzerland</strong> — clear market gap</li>
+            <li>Growing Gen Z preference for <strong>shared, sustainable transport</strong></li>
+            <li>Strong university clusters: Geneva, Lausanne, Zurich, Bern, Basel</li>
+          </ul>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="stat-card"><div class="stat-n" style="color:var(--sky);">10.5%</div><div class="stat-l">Annual ridesharing market growth (EU)</div></div>
+          <div class="stat-card"><div class="stat-n" style="color:var(--navy);">€1.4B+</div><div class="stat-l">European ridesharing market value</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 3: MARKET RESEARCH ===================== -->
+<div class="slide" id="slide-3">
+  <div class="slide-hdr">
+    <span class="s-tag">Research</span>
+    <div class="s-title">Market Research</div>
+    <div class="s-num">3 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-4" style="margin-bottom:14px;">
+      <div class="stat-card"><div class="stat-n" style="color:var(--sky);">72%</div><div class="stat-l">Swiss students seeking affordable transport alternatives</div></div>
+      <div class="stat-card"><div class="stat-n" style="color:var(--navy);">60%</div><div class="stat-l">Prefer shared rides over public transport for weekend trips</div></div>
+      <div class="stat-card"><div class="stat-n" style="color:var(--blue);">CHF 28</div><div class="stat-l">Average savings per trip vs. SBB (Geneva–Zurich)</div></div>
+      <div class="stat-card"><div class="stat-n" style="color:var(--indigo);">45%</div><div class="stat-l">Students making intercity trips at least once a month</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:10px;">📱 Discovery Channels — Awareness %</div>
+        <div style="position:relative;height:160px;"><canvas id="channelChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:10px;">🎯 Target Audience</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <div style="background:var(--lsky);border-radius:12px;padding:12px;">
+            <div style="font-size:22px;margin-bottom:6px;">👩‍🎓</div>
+            <div style="font-size:14px;font-weight:800;color:var(--navy);">Passengers</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">Budget-conscious students seeking affordable intercity travel</div>
+          </div>
+          <div style="background:var(--lb);border-radius:12px;padding:12px;">
+            <div style="font-size:22px;margin-bottom:6px;">🧑‍💻</div>
+            <div style="font-size:14px;font-weight:800;color:var(--navy);">Drivers</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;">Students owning a car and sharing travel costs on regular trips</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;"><strong style="color:var(--navy);">Age 18–26</strong> · University-enrolled · Switzerland-based · Tech-savvy · Budget-conscious · International background</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 4: COMPETITOR ANALYSIS ===================== -->
+<div class="slide" id="slide-4">
+  <div class="slide-hdr">
+    <span class="s-tag">Research</span>
+    <div class="s-title">Competitor Analysis</div>
+    <div class="s-num">4 / 24</div>
+  </div>
+  <div class="slide-body">
+    <table class="comp-table" style="margin-bottom:16px;">
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>🚗 BlaBlaCar</th>
+          <th>🚕 Uber</th>
+          <th>🚆 SBB</th>
+          <th>✨ UniRide</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Type</td><td>Direct competitor</td><td>Indirect competitor</td><td>Indirect competitor</td><td style="color:#059669;font-weight:700;">Our solution</td></tr>
+        <tr><td>Active in Switzerland</td><td><span class="xmark">✗ No</span></td><td><span class="chk">✓ Yes</span></td><td><span class="chk">✓ Yes</span></td><td><span class="chk" style="color:#059669;">✓ Yes</span></td></tr>
+        <tr><td>Student-focused</td><td>⚡ Moderate</td><td><span class="xmark">✗ No</span></td><td><span class="xmark">✗ No</span></td><td><span class="chk" style="color:#059669;">✓ 100%</span></td></tr>
+        <tr><td>Price range</td><td>CHF 5–15</td><td>CHF 20–40</td><td>CHF 15–50</td><td style="color:var(--navy);font-weight:700;">CHF 5–15</td></tr>
+        <tr><td>Cross-border</td><td><span class="chk">✓ Yes</span></td><td><span class="xmark">✗ Limited</span></td><td><span class="chk">✓ Yes</span></td><td><span class="chk" style="color:#059669;">✓ Yes</span></td></tr>
+        <tr><td>Peer-to-peer</td><td><span class="chk">✓ Yes</span></td><td><span class="xmark">✗ Professional</span></td><td><span class="xmark">✗ Operator</span></td><td><span class="chk" style="color:#059669;">✓ Yes</span></td></tr>
+        <tr><td>Loyalty Program</td><td><span class="xmark">✗ No</span></td><td>⚡ Basic</td><td>⚡ GA/HTA</td><td><span class="chk" style="color:#059669;">✓ UniPoints</span></td></tr>
+      </tbody>
+    </table>
+    <div class="grid-3">
+      <div class="card" style="border-top:3px solid var(--sky);">
+        <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚗 BlaBlaCar</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Europe's largest ridesharing platform — 100M+ users. <strong>Does not operate in Switzerland.</strong> This is UniRide's biggest opportunity.</div>
+        <span class="tag tag-sky">Direct — Not in CH</span>
+      </div>
+      <div class="card" style="border-top:3px solid var(--navy);">
+        <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚕 Uber</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Professional driver model. 2–3× more expensive than UniRide. No student focus. Active in major Swiss cities.</div>
+        <span class="tag tag-blue">Indirect — High Price</span>
+      </div>
+      <div class="card" style="border-top:3px solid var(--indigo);">
+        <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚆 SBB (Swiss Rail)</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Fixed schedules, high fares (CHF 15–50+ per trip). No peer connection. UniRide offers flexibility SBB cannot.</div>
+        <span class="tag tag-ind">Indirect — Inflexible</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 5: PERSONA SOFIA ===================== -->
+<div class="slide" id="slide-5">
+  <div class="slide-hdr">
+    <span class="s-tag">Persona 1</span>
+    <div class="s-title">Sofia Lessi — Passenger</div>
+    <div class="s-num">5 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="persona-wrap">
+      <div class="persona-left">
+        <div class="persona-avatar">S</div>
+        <div>
+          <div class="persona-name">Sofia Lessi</div>
+          <div class="persona-role">👩‍🎓 Passenger</div>
+        </div>
+        <div class="divider"></div>
+        <div class="persona-stat"><span>Age:</span><span>20 years old</span></div>
+        <div class="persona-stat"><span>Location:</span><span>Geneva, Switzerland</span></div>
+        <div class="persona-stat"><span>Education:</span><span>High School / University</span></div>
+        <div class="persona-stat"><span>Status:</span><span>Full-time Student</span></div>
+        <div class="persona-stat"><span>Origin:</span><span>Milan, Italy</span></div>
+        <div class="divider"></div>
+        <div class="persona-quote"><p>"Ridesharing makes travel feel more spontaneous — and I usually meet interesting people along the way."</p></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">📖 Background</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;">Sofia moved from Italy to Switzerland for her studies. She loves exploring European cities but must watch her budget. Swiss public transport is expensive for frequent travel. She discovered UniRide through international students who use it for trips between Switzerland, Italy, France, and Germany.</div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">✅ Motivations</div>
+            <ul class="bullet-list">
+              <li>Lower costs vs. trains and flights</li>
+              <li>Meeting international students</li>
+              <li>Flexible travel schedules</li>
+              <li>Cross-border trip convenience</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚡ Frustrations</div>
+            <ul class="bullet-list">
+              <li style="--c:#EF4444;">Hard to find late-night rides</li>
+              <li>Some drivers want too much conversation</li>
+              <li>Distant pickup points outside city centre</li>
+              <li>Uncertainty about luggage space</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 6: SOFIA JOURNEY A/S/E ===================== -->
+<div class="slide" id="slide-6">
+  <div class="slide-hdr">
+    <span class="s-tag">Persona 1 · Journey</span>
+    <div class="s-title">Sofia — Awareness · Search · Evaluation</div>
+    <div class="s-num">6 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;height:100%;">
+      <!-- AWARENESS -->
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-awareness">1. Awareness</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">📱 Instagram & TikTok</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Gen Z main platforms; high travel content consumption</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Create inspiration; position UniRide as affordable & social</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Views, likes, shares, engagement</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">💬 Word of Mouth</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Trusted peer recommendations; strong student influence</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds credibility; reduces perceived risk</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Referrals, feedback, user opinions</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- SEARCH -->
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-search">2. Search for Information</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">🤖 Chatbot</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Users have specific concerns; need instant answers</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Removes decision barriers; builds trust</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">User questions, concerns, preferences</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">🔍 Google (SEO & SEA)</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">First active search step; compare alternatives</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Captures high-intent users; drives traffic</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Keywords, click rates, search trends</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- EVALUATION -->
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-eval">3. Evaluation of Alternatives</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">📢 Online Ads (Retargeting)</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Targets users after search; reinforces awareness</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Keeps UniRide top-of-mind; increases conversion</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Clicks, impressions, conversions</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">📲 TikTok & Instagram / WOM</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Real reviews & experiences; peer validation</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust (social proof); influences perception</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Comments, shares, engagement</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">🏪 App Store</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Users validate ratings before download</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust; drives downloads</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Ratings, reviews, download counts</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 7: SOFIA JOURNEY P/PP ===================== -->
+<div class="slide" id="slide-7">
+  <div class="slide-hdr">
+    <span class="s-tag">Persona 1 · Journey</span>
+    <div class="s-title">Sofia — Purchase · Post-Purchase</div>
+    <div class="s-num">7 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%;">
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-purchase">4. Purchase</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">📲 App Download</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Final step; easy access to service</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Converts interest into action; entry point</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Downloads, install source, device type</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">📋 Account / Profile Creation</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Required to access service; personalised experience</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Enables user identification; matching with drivers</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Demographics, location, ride preferences</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-postpurchase">5. Post-Purchase</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">👤 Driver Profile & Navigation</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Transparency & safety; real-time trip visibility</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust; improves user experience</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Navigation usage, trip behaviour</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">📍 Trip Tracking & Chat</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Safety concern; real-time coordination</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Increases perceived safety; facilitates communication</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Trip data, routes, interaction frequency</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">⭐ Ratings & Email Notifications</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Share feedback; stay engaged; encourage repeat use</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Maintains quality; supports retention & loyalty</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Ratings, open rates, repeat usage</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 8: PERSONA JULIEN ===================== -->
+<div class="slide" id="slide-8">
+  <div class="slide-hdr">
+    <span class="s-tag">Persona 2</span>
+    <div class="s-title">Julien Dubois — Driver</div>
+    <div class="s-num">8 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="persona-wrap">
+      <div class="persona-left">
+        <div class="persona-avatar" style="background:linear-gradient(135deg,#2563EB,#1E3A5F);">J</div>
+        <div>
+          <div class="persona-name">Julien Dubois</div>
+          <div class="persona-role" style="background:var(--lb);">🚗 Driver</div>
+        </div>
+        <div class="divider"></div>
+        <div class="persona-stat"><span>Age:</span><span>19 years old</span></div>
+        <div class="persona-stat"><span>Location:</span><span>Lausanne, Switzerland</span></div>
+        <div class="persona-stat"><span>Education:</span><span>High School</span></div>
+        <div class="persona-stat"><span>Status:</span><span>Full-time Student & Driver</span></div>
+        <div class="persona-stat"><span>Tier:</span><span>⭐ Gold Tier Partner</span></div>
+        <div class="divider"></div>
+        <div class="persona-quote" style="background:var(--navy2);"><p>"If I'm driving anyway, it makes sense to share the ride and split the costs."</p></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">📖 Background</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.6;">Julien studies in Lausanne but regularly travels on weekends to Geneva, Bern, and his hometown. A car is expensive — fuel, insurance, parking. He started using UniRide to share travel costs with others when he was already planning a trip. His car ownership is now profitable rather than just a burden.</div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">✅ Motivations</div>
+            <ul class="bullet-list">
+              <li>Sharing fuel costs with passengers</li>
+              <li>Potential for small additional income</li>
+              <li>Ecological motivation — fewer cars on road</li>
+              <li>Enjoyable social interaction on long trips</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚡ Frustrations</div>
+            <ul class="bullet-list">
+              <li>Passengers who cancel last-minute</li>
+              <li>Passengers who arrive late</li>
+              <li>Difficulty coordinating pickup locations</li>
+              <li>Managing luggage with multiple passengers</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 9: JULIEN JOURNEY A/S/E ===================== -->
+<div class="slide" id="slide-9">
+  <div class="slide-hdr">
+    <span class="s-tag">Persona 2 · Journey</span>
+    <div class="s-title">Julien — Awareness · Search · Evaluation</div>
+    <div class="s-num">9 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;height:100%;">
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-awareness">1. Awareness</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">📱 Social Media</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">High exposure for Gen Z students; promotes cost-saving</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Creates awareness; positions UniRide as affordable & efficient</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Views, engagement, content interaction</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">💬 Word of Mouth (WOM)</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Friends already using UniRide; strong student network influence</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust; highlights financial & social benefits</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Referrals, feedback, shared experiences</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">🏫 Ads & University Groups</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Targets students directly; provides onboarding info</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Increases visibility in relevant communities</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Clicks, group engagement, sign-up interest</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-search">2. Search for Information</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">🌐 Website</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Main source of detailed info; explains pricing & safety</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Educates users; reduces uncertainty</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Page visits, time spent, click paths</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">🤖 Chat (Website/App)</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Specific questions; need personalised answers</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Removes barriers to adoption; increases confidence</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">User queries, concerns, interaction patterns</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">⭐ Reviews</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Unbiased driver & passenger opinions</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust through transparency</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Ratings, sentiment, comments</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-eval">3. Evaluation of Alternatives</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">🌐 Website (Comparison)</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Compare vs. Uber, SBB; assess flexibility & positioning</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Supports rational comparison; positions UniRide as cost-efficient</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Page views, comparison clicks, time on page</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">💬 Driver Testimonials (WOM)</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Drivers trust other driver experiences; real insights on earnings</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds credibility and trust; validates decision</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Referrals, shared experiences, feedback</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 10: JULIEN JOURNEY P/PP ===================== -->
+<div class="slide" id="slide-10">
+  <div class="slide-hdr">
+    <span class="s-tag">Persona 2 · Journey</span>
+    <div class="s-title">Julien — Purchase · Post-Purchase</div>
+    <div class="s-num">10 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%;">
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-purchase">4. Purchase</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">📲 App Download</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">First step to access the platform</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Converts interest into action; entry point</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Downloads, install source, device type</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">📋 Account Creation</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Required to use service; enables personalisation</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Identifies and profiles user; supports matching</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Demographics, location, preferences</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="j-phase">
+        <div class="j-phase-hdr j-ph-postpurchase">5. Post-Purchase</div>
+        <div class="j-channels">
+          <div class="j-ch">
+            <div class="j-ch-name">👤 Passenger Profile & Navigation</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Drivers need basic passenger info; transparency</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust and safety; helps driver make decision</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Profile views, selection behaviour</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">💬 Chat & Notifications</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Coordinate pickup, time, and trip details</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Improves efficiency and organisation; reduces friction</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Messages, response times, interaction frequency</span></div>
+          </div>
+          <div class="j-ch">
+            <div class="j-ch-name">📍 Trip Tracking & Ratings</div>
+            <div class="j-row"><span class="j-label">WHY</span><span class="j-val">Safety; accountability; feedback loop</span></div>
+            <div class="j-row"><span class="j-label">ROLE</span><span class="j-val">Builds trust; maintains quality; drives loyalty</span></div>
+            <div class="j-row"><span class="j-label">DATA</span><span class="j-val">Routes, duration, ratings, comments</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 11: APP DESIGN 1 ===================== -->
+<div class="slide" id="slide-11">
+  <div class="slide-hdr">
+    <span class="s-tag">App Design</span>
+    <div class="s-title">App Wireframes — Home & Search</div>
+    <div class="s-num">11 / 24</div>
+  </div>
+  <div class="slide-body" style="padding:12px 20px;">
+    <div class="img-pair">
+      <div class="img-frame"><img src="../photos/page7_img2.png" alt="App Home Screen"></div>
+      <div class="img-frame"><img src="../photos/page8_img1.png" alt="App Search Screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 12: APP DESIGN 2 ===================== -->
+<div class="slide" id="slide-12">
+  <div class="slide-hdr">
+    <span class="s-tag">App Design</span>
+    <div class="s-title">App Wireframes — Trip & Booking</div>
+    <div class="s-num">12 / 24</div>
+  </div>
+  <div class="slide-body" style="padding:12px 20px;">
+    <div class="img-pair">
+      <div class="img-frame"><img src="../photos/page9_img1.png" alt="App Trip Screen"></div>
+      <div class="img-frame"><img src="../photos/page9_img2.png" alt="App Booking Screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 13: APP DESIGN 3 ===================== -->
+<div class="slide" id="slide-13">
+  <div class="slide-hdr">
+    <span class="s-tag">App Design</span>
+    <div class="s-title">App Wireframes — Driver Features</div>
+    <div class="s-num">13 / 24</div>
+  </div>
+  <div class="slide-body" style="padding:12px 20px;">
+    <div class="img-pair">
+      <div class="img-frame"><img src="../photos/page10_img1.png" alt="Driver Feature Screen"></div>
+      <div class="img-frame"><img src="../photos/page11_img1.png" alt="Driver Points Screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 14: DRIVER LOYALTY ===================== -->
+<div class="slide" id="slide-14">
+  <div class="slide-hdr">
+    <span class="s-tag">Loyalty Program</span>
+    <div class="s-title">Driver Loyalty Program — UniPoints</div>
+    <div class="s-num">14 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2" style="margin-bottom:14px;">
+      <div class="card-navy" style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:40px;">🏅</div>
+        <div><div style="font-size:22px;font-weight:900;color:white;">Gold Tier Partner</div><div style="font-size:13px;color:rgba(255,255,255,0.65);margin-top:4px;">Earn 10 points per ride · Unlock exclusive driver rewards</div></div>
+      </div>
+      <div class="card-navy" style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:40px;">⚡</div>
+        <div><div style="font-size:22px;font-weight:900;color:white;">480 / 500 pts</div><div style="font-size:13px;color:rgba(255,255,255,0.65);margin-top:4px;">Current balance · Only 20 pts to next reward!</div></div>
+      </div>
+    </div>
+    <div class="loyalty-row"><span class="loyalty-icon">⛽</span><div><div class="loyalty-title">Fuel Vouchers</div><div class="loyalty-desc">Migrol CHF 20 (200 pts) or Coop Pronto CHF 50 (450 pts). Valid at participating Swiss stations.</div></div><span class="loyalty-pts">200 pts</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">💳</span><div><div class="loyalty-title">Cash Back to Account</div><div class="loyalty-desc">CHF 10 (100 pts) or CHF 25 (240 pts) direct bank transfer. Ideal for EV drivers.</div></div><span class="loyalty-pts">100 pts</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">🚗</span><div><div class="loyalty-title">Priority Ride Matching</div><div class="loyalty-desc">Gold tier drivers receive priority passenger matching during peak hours and busy routes.</div></div><span class="loyalty-pts">Gold</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">📊</span><div><div class="loyalty-title">Performance Dashboard</div><div class="loyalty-desc">Track monthly rides, completion rate, cancellation rate, and weekly activity trends in real-time.</div></div><span class="loyalty-pts">Free</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">🌱</span><div><div class="loyalty-title">Eco Bonus Points</div><div class="loyalty-desc">Earn +5 bonus points per ride when driving an electric or hybrid vehicle — sustainable driving rewarded.</div></div><span class="loyalty-pts">+5 pts</span></div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 15: DRIVER LOYALTY WIREFRAMES ===================== -->
+<div class="slide" id="slide-15">
+  <div class="slide-hdr">
+    <span class="s-tag">Loyalty Program</span>
+    <div class="s-title">Driver Loyalty — App Screens</div>
+    <div class="s-num">15 / 24</div>
+  </div>
+  <div class="slide-body" style="padding:12px 20px;">
+    <div class="img-pair">
+      <div class="img-frame"><img src="../photos/page11_img2.png" alt="Driver Dashboard"></div>
+      <div class="img-frame"><img src="../photos/page13_img1.png" alt="Driver Redeem Points"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 16: PASSENGER LOYALTY ===================== -->
+<div class="slide" id="slide-16">
+  <div class="slide-hdr">
+    <span class="s-tag">Loyalty Program</span>
+    <div class="s-title">Passenger Loyalty Program — UniPoints</div>
+    <div class="s-num">16 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2" style="margin-bottom:14px;">
+      <div class="card-navy" style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:40px;">🥈</div>
+        <div><div style="font-size:22px;font-weight:900;color:white;">Silver Member</div><div style="font-size:13px;color:rgba(255,255,255,0.65);margin-top:4px;">240 / 500 pts · 260 points from Gold Tier!</div></div>
+      </div>
+      <div class="card-navy" style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:40px;">⚡</div>
+        <div><div style="font-size:22px;font-weight:900;color:white;">+10 pts / ride</div><div style="font-size:13px;color:rgba(255,255,255,0.65);margin-top:4px;">Standard ride earning · Bonus events available</div></div>
+      </div>
+    </div>
+    <div class="loyalty-row"><span class="loyalty-icon">☕</span><div><div class="loyalty-title">Campus Cafe — Free Espresso</div><div class="loyalty-desc">Redeem 120 points for a free espresso at participating university campus cafes.</div></div><span class="loyalty-pts">120 pts</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">📅</span><div><div class="loyalty-title">Weekly Bonus Rides</div><div class="loyalty-desc">Complete 3 rides in a single week to earn +15 bonus points automatically.</div></div><span class="loyalty-pts">+15 pts</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">👥</span><div><div class="loyalty-title">Referral Program</div><div class="loyalty-desc">Invite a classmate to join UniRide and earn +50 points once they complete their first ride.</div></div><span class="loyalty-pts">+50 pts</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">⭐</span><div><div class="loyalty-title">Priority Matching (Silver+)</div><div class="loyalty-desc">Silver and Gold members receive priority matching with verified drivers during peak hours.</div></div><span class="loyalty-pts">Silver+</span></div>
+    <div class="loyalty-row"><span class="loyalty-icon">🔒</span><div><div class="loyalty-title">Zero Cancellation Fees (Gold)</div><div class="loyalty-desc">Gold tier passengers enjoy zero cancellation fees on all bookings — complete peace of mind.</div></div><span class="loyalty-pts">Gold</span></div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 17: PASSENGER LOYALTY WIREFRAMES ===================== -->
+<div class="slide" id="slide-17">
+  <div class="slide-hdr">
+    <span class="s-tag">Loyalty Program</span>
+    <div class="s-title">Passenger Loyalty — App Screens</div>
+    <div class="s-num">17 / 24</div>
+  </div>
+  <div class="slide-body" style="padding:12px 20px;">
+    <div class="img-pair">
+      <div class="img-frame"><img src="../photos/page13_img2.png" alt="Passenger Rewards Screen"></div>
+      <div class="img-frame"><img src="../photos/page15_img1.png" alt="Passenger Points Screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 18: TERMS & CONDITIONS ===================== -->
+<div class="slide" id="slide-18">
+  <div class="slide-hdr">
+    <span class="s-tag">Platform Rules</span>
+    <div class="s-title">Terms &amp; Conditions</div>
+    <div class="s-num">18 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="tc-grid">
+      <div class="tc-card"><div class="tc-icon">🎓</div><div class="tc-title">Student Verification</div><div class="tc-text">All users must register with a valid university student email (.edu or institutional). Profiles are verified before access is granted to protect the community.</div></div>
+      <div class="tc-card"><div class="tc-icon">🔒</div><div class="tc-title">Identity & Safety</div><div class="tc-text">Government ID verification required for drivers. Passengers must have a completed profile. Background checks encouraged for Gold Tier drivers.</div></div>
+      <div class="tc-card"><div class="tc-icon">💳</div><div class="tc-title">Payment Rules</div><div class="tc-text">Payments processed in-app only. No cash transactions. Prices are set by the driver and must comply with UniRide's fare guidelines. UniRide takes 15% platform fee.</div></div>
+      <div class="tc-card"><div class="tc-icon">❌</div><div class="tc-title">Cancellation Policy</div><div class="tc-text">Free cancellation up to 2 hours before departure. Late cancellations (under 2h) incur a CHF 3 fee. Gold tier passengers are exempt from all cancellation fees.</div></div>
+      <div class="tc-card"><div class="tc-icon">⭐</div><div class="tc-title">Rating System</div><div class="tc-text">All rides are mutually rated (driver ↔ passenger). Profiles below 4.0/5.0 are reviewed automatically. Consistently low-rated users may be suspended.</div></div>
+      <div class="tc-card"><div class="tc-icon">🛡️</div><div class="tc-title">Insurance & Liability</div><div class="tc-text">Drivers must hold valid Swiss vehicle insurance. UniRide provides supplemental ride-sharing coverage. UniRide is not liable for personal property loss during trips.</div></div>
+    </div>
+    <div style="background:var(--lb);border-radius:12px;padding:12px 16px;margin-top:14px;display:flex;gap:10px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;">ℹ️</span>
+      <span style="font-size:12px;color:var(--navy);line-height:1.6;"><strong>Data Protection:</strong> UniRide complies with Swiss FADP and EU GDPR regulations. User location data is only collected during active trips. No data sold to third parties.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 19: 7 ATTRIBUTES PASSENGER ===================== -->
+<div class="slide" id="slide-19">
+  <div class="slide-hdr">
+    <span class="s-tag">Attributes</span>
+    <div class="s-title">7 Attributes — Passenger Perspective</div>
+    <div class="s-num">19 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2" style="height:100%;">
+      <div>
+        <div style="margin-bottom:10px;padding:10px;background:var(--lsky);border-radius:12px;font-size:12px;color:var(--navy);font-weight:600;">How important are these features to you as a <strong>passenger</strong>? Rate 1–5</div>
+        <div style="position:relative;height:200px;"><canvas id="passengerAttrChart"></canvas></div>
+      </div>
+      <div class="img-frame" style="max-height:320px;">
+        <img src="../photos/page15_img2.png" alt="Passenger questionnaire wireframe" style="max-width:100%;max-height:100%;object-fit:contain;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 20: 7 ATTRIBUTES DRIVER ===================== -->
+<div class="slide" id="slide-20">
+  <div class="slide-hdr">
+    <span class="s-tag">Attributes</span>
+    <div class="s-title">7 Attributes — Driver Perspective</div>
+    <div class="s-num">20 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div class="grid-2" style="height:100%;">
+      <div>
+        <div style="margin-bottom:10px;padding:10px;background:var(--lb);border-radius:12px;font-size:12px;color:var(--navy);font-weight:600;">How important are these features to you as a <strong>driver</strong>? Rate 1–5</div>
+        <div style="position:relative;height:200px;"><canvas id="driverAttrChart"></canvas></div>
+      </div>
+      <div class="img-frame" style="max-height:320px;">
+        <img src="../photos/page16_img1.png" alt="Driver questionnaire wireframe" style="max-width:100%;max-height:100%;object-fit:contain;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 21: QUESTIONNAIRE WIREFRAMES ===================== -->
+<div class="slide" id="slide-21">
+  <div class="slide-hdr">
+    <span class="s-tag">Research Tool</span>
+    <div class="s-title">Questionnaire — App Wireframes</div>
+    <div class="s-num">21 / 24</div>
+  </div>
+  <div class="slide-body" style="padding:12px 20px;">
+    <div class="img-pair">
+      <div class="img-frame"><img src="../photos/page16_img2.png" alt="Driver questionnaire wireframe"></div>
+      <div class="img-frame"><img src="../photos/page17_img1.png" alt="Passenger questionnaire wireframe"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 22: IPA DRIVER ===================== -->
+<div class="slide" id="slide-22">
+  <div class="slide-hdr">
+    <span class="s-tag">IPA Analysis</span>
+    <div class="s-title">IPA Matrix — Driver Perspective</div>
+    <div class="s-num">22 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;height:100%;">
+      <div style="position:relative;background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);">
+        <canvas id="ipaDriver"></canvas>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">📋 Quadrant Legend</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#059669;border-radius:3px;flex-shrink:0;"></div><div><strong>Keep/Maintain</strong> — High I + High P</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#EF4444;border-radius:3px;flex-shrink:0;"></div><div><strong>Concentrate Here</strong> — High I + Low P</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#F97316;border-radius:3px;flex-shrink:0;"></div><div><strong>Low Priority</strong> — Low I + Low P</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#6366F1;border-radius:3px;flex-shrink:0;"></div><div><strong>Possible Overkill</strong> — Low I + High P</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">🏷️ Data Points</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--muted);">
+            <div><strong style="color:var(--navy);">Q1</strong> Find passengers quickly (P:3.3, I:4.4)</div>
+            <div><strong style="color:var(--navy);">Q2</strong> Communication tools (P:3.5, I:4.0)</div>
+            <div><strong style="color:var(--navy);">Q3</strong> Route &amp; trip management (P:3.6, I:4.2)</div>
+            <div><strong style="color:var(--navy);">Q4</strong> Fair pricing (P:2.9, I:4.6)</div>
+            <div><strong style="color:var(--navy);">Q5</strong> Passenger reliability (P:3.3, I:4.4)</div>
+            <div><strong style="color:var(--navy);">Q6</strong> Passenger verification (P:3.6, I:4.6)</div>
+            <div><strong style="color:var(--navy);">Q7</strong> App usability (P:3.7, I:4.2)</div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--muted);">Mean Performance: <strong style="color:var(--navy);">3.49</strong> &nbsp;|&nbsp; Mean Importance: <strong style="color:var(--navy);">4.34</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 23: IPA PASSENGER ===================== -->
+<div class="slide" id="slide-23">
+  <div class="slide-hdr">
+    <span class="s-tag">IPA Analysis</span>
+    <div class="s-title">IPA Matrix — Passenger Perspective</div>
+    <div class="s-num">23 / 24</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;height:100%;">
+      <div style="position:relative;background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);">
+        <canvas id="ipaPassenger"></canvas>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">📋 Quadrant Legend</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#059669;border-radius:3px;flex-shrink:0;"></div><div><strong>Keep/Maintain</strong> — High I + High P</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#EF4444;border-radius:3px;flex-shrink:0;"></div><div><strong>Concentrate Here</strong> — High I + Low P</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#F97316;border-radius:3px;flex-shrink:0;"></div><div><strong>Low Priority</strong> — Low I + Low P</div></div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="width:12px;height:12px;background:#6366F1;border-radius:3px;flex-shrink:0;"></div><div><strong>Possible Overkill</strong> — Low I + High P</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">🏷️ Data Points</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--muted);">
+            <div><strong style="color:var(--navy);">Q1</strong> Pickup &amp; drop-off (P:3.8, I:4.3)</div>
+            <div><strong style="color:var(--navy);">Q2</strong> Time flexibility (P:3.5, I:4.1)</div>
+            <div><strong style="color:var(--navy);">Q3</strong> Budget sensitivity (P:3.2, I:4.45)</div>
+            <div><strong style="color:var(--navy);">Q4</strong> Ride preferences (P:2.9, I:3.6)</div>
+            <div><strong style="color:var(--navy);">Q5</strong> Trip purpose (P:3.2, I:3.3)</div>
+            <div><strong style="color:var(--navy);">Q6</strong> Safety preferences (P:3.6, I:4.7)</div>
+            <div><strong style="color:var(--navy);">Q7</strong> Accessibility (P:2.5, I:3.2)</div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:11px;color:var(--muted);">Mean Performance: <strong style="color:var(--navy);">3.24</strong> &nbsp;|&nbsp; Mean Importance: <strong style="color:var(--navy);">3.95</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SLIDE 24: CONCLUSIONS ===================== -->
+<div class="slide dark-slide" id="slide-24">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(14,165,233,0.18),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(99,102,241,0.15),transparent 60%);pointer-events:none;"></div>
+    <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">CIDCM Milestone 3 · Team 5/6 .08</div>
+    <div style="font-size:38px;font-weight:900;color:white;letter-spacing:-1px;margin-bottom:6px;text-align:center;">Key Conclusions</div>
+    <div style="font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:24px;text-align:center;">UniRide — Consumer Information & Decision Channel Mapping</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px;width:100%;margin-bottom:22px;">
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px;">🎯</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:6px;">Clear Market Opportunity</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.6;">BlaBlaCar's absence from Switzerland leaves a significant gap that UniRide is uniquely positioned to fill with a student-first approach.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px;">📱</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:6px;">Social Media is Critical</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.6;">Instagram, TikTok, and Word of Mouth drive 78–85% of Gen Z awareness. Digital-first campaigns are non-negotiable for acquisition.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px;">🔒</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:6px;">Safety is Non-Negotiable</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.6;">IPA analysis reveals Safety &amp; Verification scores highest on importance for both user segments — must be a core product pillar.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px;">🏆</div>
+        <div style="font-size:14px;font-weight:800;color:white;margin-bottom:6px;">Loyalty Drives Retention</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.6;">UniPoints loyalty program addresses long-term retention. Eco Bonuses and Campus Perks differentiate from generic ridesharing apps.</div>
+      </div>
+    </div>
+    <div style="background:rgba(14,165,233,0.2);border:1px solid rgba(14,165,233,0.4);border-radius:14px;padding:14px 22px;max-width:620px;text-align:center;">
+      <div style="font-size:14px;font-weight:800;color:white;margin-bottom:4px;">📍 Next Steps</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.7;">Launch beta in Geneva &amp; Lausanne → Collect first 500 user reviews → A/B test loyalty tiers → Expand to Zurich &amp; Bern by Q3 2026</div>
+    </div>
+    <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:7px 14px;border-radius:30px;font-size:12px;font-weight:600;">Olimpia Lorenzetti</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:7px 14px;border-radius:30px;font-size:12px;font-weight:600;">Anna Wong</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:7px 14px;border-radius:30px;font-size:12px;font-weight:600;">Marina White</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:7px 14px;border-radius:30px;font-size:12px;font-weight:600;">Rasha</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:7px 14px;border-radius:30px;font-size:12px;font-weight:600;">Ilya Itin</span>
+      <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.75);padding:7px 14px;border-radius:30px;font-size:12px;font-weight:600;">Ilana Gonzalez</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /slides-wrap -->
+
+<div class="bottom-nav">
+  <button class="nav-arrow" id="btn-prev" onclick="changeSlide(-1)">← Prev</button>
+  <div class="nav-dots" id="nav-dots"></div>
+  <button class="nav-arrow" id="btn-next" onclick="changeSlide(1)">Next →</button>
+</div>
+
+<script>
+// ============ SLIDE SYSTEM ============
+const TOTAL = 24;
+let current = 1;
+
+function buildDots() {
+  const wrap = document.getElementById('nav-dots');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'ndot' + (i === current ? ' active' : '');
+    d.title = 'Slide ' + i;
+    d.onclick = () => goToSlide(i);
+    wrap.appendChild(d);
+  }
+}
+
+function updateUI() {
+  document.getElementById('slide-counter').textContent = current + ' / ' + TOTAL;
+  document.getElementById('progress-fill').style.width = ((current / TOTAL) * 100) + '%';
+  document.getElementById('btn-prev').disabled = current <= 1;
+  document.getElementById('btn-next').disabled = current >= TOTAL;
+  document.querySelectorAll('.ndot').forEach((d, i) => {
+    d.classList.toggle('active', i + 1 === current);
+  });
+}
+
+function goToSlide(n) {
+  if (n < 1 || n > TOTAL) return;
+  const prev = document.getElementById('slide-' + current);
+  const next = document.getElementById('slide-' + n);
+  if (!next) return;
+  const dir = n > current ? 1 : -1;
+  prev.classList.remove('active');
+  prev.style.transform = 'translateX(' + (-dir * 60) + 'px)';
+  prev.style.opacity = '0';
+  setTimeout(() => { prev.style.transform = ''; prev.style.opacity = ''; }, 400);
+  next.style.transform = 'translateX(' + (dir * 60) + 'px)';
+  next.style.opacity = '0';
+  next.classList.add('active');
+  requestAnimationFrame(() => {
+    next.style.transition = 'opacity 0.4s, transform 0.4s cubic-bezier(0.4,0,0.2,1)';
+    next.style.transform = 'translateX(0)';
+    next.style.opacity = '1';
+  });
+  current = n;
+  updateUI();
+  if (n === 3)  setTimeout(initChannelChart, 300);
+  if (n === 19) setTimeout(initPassengerAttrChart, 300);
+  if (n === 20) setTimeout(initDriverAttrChart, 300);
+  if (n === 22) setTimeout(initDriverChart, 300);
+  if (n === 23) setTimeout(initPassengerChart, 300);
+}
+
+function changeSlide(dir) { goToSlide(current + dir); }
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+  if (e.key === 'Home') goToSlide(1);
+  if (e.key === 'End')  goToSlide(TOTAL);
+});
+
+// Touch swipe
+let touchX = null;
+document.getElementById('slides-wrap').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.getElementById('slides-wrap').addEventListener('touchend', e => {
+  if (!touchX) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) changeSlide(dx < 0 ? 1 : -1);
+  touchX = null;
+});
+
+// Init
+buildDots();
+updateUI();
+
+// ============ CHANNEL CHART (Slide 3) ============
+let channelChartInit = false;
+function initChannelChart() {
+  if (channelChartInit) return;
+  channelChartInit = true;
+  const ctx = document.getElementById('channelChart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['📸 Instagram/TikTok', '💬 Word of Mouth', '🔍 Google (SEO/SEA)', '🏫 Uni Groups/Posters', '📲 App Store (ASO)'],
+      datasets: [{
+        label: 'Awareness %',
+        data: [78, 85, 60, 55, 52],
+        backgroundColor: ['#0EA5E9','#1E3A5F','#2563EB','#6366F1','#0EA5E9'],
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => c.raw + '%' } }
+      },
+      scales: {
+        x: { min: 0, max: 100, ticks: { callback: v => v + '%', font:{size:11} }, grid: { color: '#E2EAF4' } },
+        y: { ticks: { font:{size:11} }, grid: { display: false } }
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+// ============ PASSENGER ATTRIBUTES CHART (Slide 19) ============
+let passAttrInit = false;
+function initPassengerAttrChart() {
+  if (passAttrInit) return;
+  passAttrInit = true;
+  const ctx = document.getElementById('passengerAttrChart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Pickup & Drop-off','Time Flexibility','Budget Sensitivity','Ride Atmosphere','Trip Purpose','Safety & Verification','Accessibility'],
+      datasets: [
+        { label: 'Importance', data: [4.29, 4.11, 4.45, 3.60, 3.35, 4.69, 3.18], backgroundColor: '#1E3A5F', borderRadius: 6, borderSkipped: false },
+        { label: 'Performance', data: [3.80, 3.48, 3.21, 2.91, 3.11, 3.61, 2.49], backgroundColor: '#0EA5E9', borderRadius: 6, borderSkipped: false }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font:{size:11}, boxWidth: 12 } },
+        tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw } }
+      },
+      scales: {
+        x: { min: 1, max: 5, ticks: { font:{size:10} }, grid: { color: '#E2EAF4' } },
+        y: { ticks: { font:{size:10} }, grid: { display: false } }
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+// ============ DRIVER ATTRIBUTES CHART (Slide 20) ============
+let driverAttrInit = false;
+function initDriverAttrChart() {
+  if (driverAttrInit) return;
+  driverAttrInit = true;
+  const ctx = document.getElementById('driverAttrChart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Find Passengers','Comms Tools','Route Management','Fair Pricing','Passenger Reliability','Passenger Verification','App Usability'],
+      datasets: [
+        { label: 'Importance', data: [4.39, 3.97, 4.17, 4.78, 4.46, 4.60, 4.13], backgroundColor: '#1E3A5F', borderRadius: 6, borderSkipped: false },
+        { label: 'Performance', data: [3.02, 3.42, 3.54, 2.85, 3.11, 3.34, 3.66], backgroundColor: '#2563EB', borderRadius: 6, borderSkipped: false }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font:{size:11}, boxWidth: 12 } },
+        tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.raw } }
+      },
+      scales: {
+        x: { min: 1, max: 5, ticks: { font:{size:10} }, grid: { color: '#E2EAF4' } },
+        y: { ticks: { font:{size:10} }, grid: { display: false } }
+      },
+      animation: { duration: 900, easing: 'easeOutQuart' }
+    }
+  });
+}
+
+// ============ IPA CHART — DRIVER ============
+let driverChartInit = false;
+function initDriverChart() {
+  if (driverChartInit) return;
+  driverChartInit = true;
+  const ctx = document.getElementById('ipaDriver');
+  if (!ctx) return;
+  const meanP = 3.34, meanI = 4.36;
+  const data = [
+    {x:3.02,y:4.39,label:'Q1'},
+    {x:3.42,y:3.97,label:'Q2'},
+    {x:3.54,y:4.17,label:'Q3'},
+    {x:2.85,y:4.78,label:'Q4'},
+    {x:3.11,y:4.46,label:'Q5'},
+    {x:3.34,y:4.60,label:'Q6'},
+    {x:3.66,y:4.13,label:'Q7'},
+  ];
+  const pointColors = data.map(d => {
+    if (d.x >= meanP && d.y >= meanI) return '#059669';
+    if (d.x < meanP  && d.y >= meanI) return '#EF4444';
+    if (d.x < meanP  && d.y < meanI)  return '#F97316';
+    return '#6366F1';
+  });
+
+  new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Driver Attributes',
+        data: data,
+        backgroundColor: pointColors,
+        pointRadius: 10,
+        pointHoverRadius: 12,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      scales: {
+        x: {
+          min: 2.0, max: 5.0,
+          title: { display: true, text: 'Performance (Mean = ' + meanP + ')', font: {size:12, weight:'700'}, color: '#1E3A5F' },
+          grid: { color: '#E2EAF4' },
+          ticks: { font: {size:11} }
+        },
+        y: {
+          min: 2.5, max: 5.2,
+          title: { display: true, text: 'Importance (Mean = ' + meanI + ')', font: {size:12, weight:'700'}, color: '#1E3A5F' },
+          grid: { color: '#E2EAF4' },
+          ticks: { font: {size:11} }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx2 => {
+              const d = ctx2.raw;
+              return d.label + ': P=' + d.x + ', I=' + d.y;
+            }
+          }
+        }
+      },
+      animation: { duration: 1000, easing: 'easeOutQuart' }
+    },
+    plugins: [{
+      id: 'meanLines',
+      afterDraw(chart) {
+        const {ctx:c, scales:{x,y}} = chart;
+        c.save();
+        // Vertical mean line (performance)
+        c.beginPath();
+        c.strokeStyle = '#1E3A5F';
+        c.setLineDash([5,4]);
+        c.lineWidth = 1.5;
+        const px = x.getPixelForValue(meanP);
+        c.moveTo(px, y.top); c.lineTo(px, y.bottom); c.stroke();
+        // Horizontal mean line (importance)
+        c.beginPath();
+        const py = y.getPixelForValue(meanI);
+        c.moveTo(x.left, py); c.lineTo(x.right, py); c.stroke();
+        c.setLineDash([]);
+        // Quadrant labels
+        c.font = 'bold 11px Inter, sans-serif';
+        c.fillStyle = 'rgba(30,58,95,0.35)';
+        c.fillText('Keep/Maintain', px + 6, y.top + 16);
+        c.fillText('Concentrate Here', x.left + 4, y.top + 16);
+        c.fillText('Low Priority', x.left + 4, y.bottom - 6);
+        c.fillText('Possible Overkill', px + 6, y.bottom - 6);
+        // Point labels
+        chart.data.datasets[0].data.forEach((d, i) => {
+          const cx2 = x.getPixelForValue(d.x);
+          const cy2 = y.getPixelForValue(d.y);
+          c.font = 'bold 11px Inter, sans-serif';
+          c.fillStyle = '#1E3A5F';
+          c.fillText(d.label, cx2 + 7, cy2 - 5);
+        });
+        c.restore();
+      }
+    }]
+  });
+}
+
+// ============ IPA CHART — PASSENGER ============
+let passChartInit = false;
+function initPassengerChart() {
+  if (passChartInit) return;
+  passChartInit = true;
+  const ctx = document.getElementById('ipaPassenger');
+  if (!ctx) return;
+  const meanP = 3.23, meanI = 3.95;
+  const data = [
+    {x:3.80,y:4.29,label:'Q1'},
+    {x:3.48,y:4.11,label:'Q2'},
+    {x:3.21,y:4.45,label:'Q3'},
+    {x:2.91,y:3.60,label:'Q4'},
+    {x:3.11,y:3.35,label:'Q5'},
+    {x:3.61,y:4.69,label:'Q6'},
+    {x:2.49,y:3.18,label:'Q7'},
+  ];
+  const pointColors = data.map(d => {
+    if (d.x >= meanP && d.y >= meanI) return '#059669';
+    if (d.x < meanP  && d.y >= meanI) return '#EF4444';
+    if (d.x < meanP  && d.y < meanI)  return '#F97316';
+    return '#6366F1';
+  });
+
+  new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Passenger Attributes',
+        data: data,
+        backgroundColor: pointColors,
+        pointRadius: 10,
+        pointHoverRadius: 12,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      scales: {
+        x: {
+          min: 2.0, max: 5.0,
+          title: { display: true, text: 'Performance (Mean = ' + meanP + ')', font: {size:12, weight:'700'}, color: '#1E3A5F' },
+          grid: { color: '#E2EAF4' },
+          ticks: { font: {size:11} }
+        },
+        y: {
+          min: 2.0, max: 5.0,
+          title: { display: true, text: 'Importance (Mean = ' + meanI + ')', font: {size:12, weight:'700'}, color: '#1E3A5F' },
+          grid: { color: '#E2EAF4' },
+          ticks: { font: {size:11} }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx2 => {
+              const d = ctx2.raw;
+              return d.label + ': P=' + d.x + ', I=' + d.y;
+            }
+          }
+        }
+      },
+      animation: { duration: 1000, easing: 'easeOutQuart' }
+    },
+    plugins: [{
+      id: 'meanLines2',
+      afterDraw(chart) {
+        const {ctx:c, scales:{x,y}} = chart;
+        c.save();
+        c.beginPath();
+        c.strokeStyle = '#1E3A5F'; c.setLineDash([5,4]); c.lineWidth = 1.5;
+        const px = x.getPixelForValue(meanP);
+        c.moveTo(px, y.top); c.lineTo(px, y.bottom); c.stroke();
+        c.beginPath();
+        const py = y.getPixelForValue(meanI);
+        c.moveTo(x.left, py); c.lineTo(x.right, py); c.stroke();
+        c.setLineDash([]);
+        c.font = 'bold 11px Inter, sans-serif';
+        c.fillStyle = 'rgba(30,58,95,0.35)';
+        c.fillText('Keep/Maintain', px + 6, y.top + 16);
+        c.fillText('Concentrate Here', x.left + 4, y.top + 16);
+        c.fillText('Low Priority', x.left + 4, y.bottom - 6);
+        c.fillText('Possible Overkill', px + 6, y.bottom - 6);
+        chart.data.datasets[0].data.forEach(d => {
+          const cx2 = x.getPixelForValue(d.x);
+          const cy2 = y.getPixelForValue(d.y);
+          c.font = 'bold 11px Inter, sans-serif';
+          c.fillStyle = '#1E3A5F';
+          c.fillText(d.label, cx2 + 7, cy2 - 5);
+        });
+        c.restore();
+      }
+    }]
+  });
+}
+</script>
+</body>
+</html>

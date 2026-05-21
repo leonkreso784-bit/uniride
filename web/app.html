@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniRide — App Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   #1E3A5F;
+      --navy2:  #1B3358;
+      --sky:    #0EA5E9;
+      --blue:   #2563EB;
+      --white:  #FFFFFF;
+      --bg:     #4A8FD4;
+      --appbg:  #F0F4FF;
+      --card:   #FFFFFF;
+      --border: #E8EDF5;
+      --text:   #1B3358;
+      --muted:  #64748B;
+      --green:  #10B981;
+      --orange: #F97316;
+      --red:    #EF4444;
+      --gold:   #F59E0B;
+      --lsky:   #E0F2FE;
+    }
+    html, body {
+      height: 100%; overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* PAGE BG — locked to viewport, no page scroll */
+    body {
+      background: linear-gradient(160deg, #1a3560 0%, var(--bg) 50%, #2b7fd4 100%);
+      height: 100vh; overflow: hidden;
+      /* no flex needed here — phone-stage is fixed */
+    }
+
+    /* TOP NAV */
+    .topnav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 28px;
+      background: rgba(15,32,64,0.65);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .topnav .nav-logo { display:flex; align-items:center; gap:8px; color:white; font-weight:800; font-size:16px; text-decoration:none; }
+    .topnav .nav-links { display:flex; gap:8px; }
+    .nav-btn {
+      padding:7px 16px; border-radius:30px; font-size:13px; font-weight:600;
+      text-decoration:none; transition:all 0.2s; cursor:pointer;
+    }
+    .nav-btn.home { background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2); }
+    .nav-btn.pres { background:rgba(99,102,241,0.8); color:white; }
+    .nav-btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
+
+    /* SCREEN NAVIGATOR */
+    .screen-nav {
+      position: fixed; top: 62px; left: 50%; transform: translateX(-50%);
+      z-index: 150;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      background: rgba(10,20,48,0.82);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 9px 18px 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      min-width: 260px;
+      max-width: min(92vw, 380px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .screen-nav-row {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+    }
+    .nav-arrow {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+      color: white; font-size: 22px; font-weight: 300; line-height: 1;
+      border-radius: 50%; width: 30px; height: 30px; flex-shrink: 0;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .nav-arrow:hover:not(:disabled) { background: var(--sky); border-color: var(--sky); box-shadow: 0 0 10px rgba(14,165,233,0.5); }
+    .nav-arrow:disabled { opacity: 0.25; cursor: default; }
+    .screen-label {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .screen-label-name { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; }
+    .screen-label-num { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500; }
+    .screen-dots {
+      display: flex; gap: 5px; align-items: center; justify-content: center;
+    }
+    .screen-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.22); cursor: pointer;
+      transition: all 0.25s ease; border: none; padding: 0;
+    }
+    .screen-dot.active {
+      background: var(--sky); width: 18px; border-radius: 3px;
+      box-shadow: 0 0 8px rgba(14,165,233,0.6);
+    }
+    .screen-dot:hover:not(.active) { background: rgba(255,255,255,0.5); }
+
+    /* PHONE FRAME WRAPPER — fixed, fills viewport below the tab bar */
+    .phone-stage {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      /* top is set by JS after measuring the selector bar */
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    /* Phone scale wrapper — JS sets transform: scale() */
+    .phone-scale-wrap {
+      flex-shrink: 0;
+      transform-origin: center center;
+      transition: transform 0.15s ease;
+    }
+
+    .phone-outer {
+      width: 375px;
+      height: 780px;
+      background: #1a1a1a;
+      border-radius: 52px;
+      padding: 8px;
+      box-shadow:
+        0 0 0 1px #3a3a3a,
+        0 0 0 3px #222,
+        0 32px 80px rgba(0,0,0,0.55),
+        0 0 60px rgba(14,165,233,0.18);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Side buttons */
+    .phone-outer::before {
+      content: '';
+      position: absolute; left: -4px; top: 140px;
+      width: 4px; height: 32px; background: #555; border-radius: 2px 0 0 2px;
+      box-shadow: 0 44px 0 #555, 0 80px 0 #555;
+    }
+    .phone-outer::after {
+      content: '';
+      position: absolute; right: -4px; top: 180px;
+      width: 4px; height: 56px; background: #555; border-radius: 0 2px 2px 0;
+    }
+
+    .phone-inner {
+      width: 100%; height: 100%;
+      background: white;
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Notch */
+    .notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 130px; height: 34px;
+      background: #222; border-radius: 0 0 20px 20px;
+      z-index: 50;
+    }
+
+    /* STATUS BAR */
+    .status-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 48px 20px 8px;
+      font-size: 12px; font-weight: 600; color: var(--text);
+      background: white; position: relative; z-index: 10;
+    }
+    .status-bar .time { font-weight: 700; }
+    .status-icons { display: flex; gap: 4px; align-items: center; }
+
+    /* SCREENS CONTAINER */
+    .screens-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+    }
+
+    /* Individual screen */
+    .screen {
+      position: absolute; inset: 0;
+      background: var(--appbg);
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transform: translateX(30px);
+      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+      overflow: hidden;
+    }
+    .screen.active {
+      opacity: 1; pointer-events: all;
+      transform: translateX(0);
+    }
+    .screen.exit {
+      opacity: 0; transform: translateX(-30px);
+    }
+
+    /* SCROLL AREA (content) */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .s-content { padding: 0 16px 80px; }
+
+    /* APP HEADER */
+    .app-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px 10px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+    }
+    .app-header .menu-icon { font-size: 18px; cursor: pointer; }
+    .app-header .brand { font-size: 17px; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 6px; }
+    .app-header .notif { font-size: 18px; cursor: pointer; }
+    .app-header .back-btn { font-size: 18px; cursor: pointer; color: var(--navy); }
+    .app-header .right-icons { display: flex; gap: 12px; font-size: 18px; }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: white;
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding: 8px 0 16px;
+      z-index: 30;
+    }
+    .bnav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      cursor: pointer; font-size: 10px; font-weight: 600; color: var(--muted);
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .bnav-item.active { color: var(--navy); }
+    .bnav-item .bnav-icon { font-size: 20px; }
+
+    /* ===================== COMPONENTS ===================== */
+
+    /* Card */
+    .card {
+      background: white; border-radius: 16px;
+      padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* Section title */
+    .sec-title {
+      font-size: 16px; font-weight: 800; color: var(--navy);
+      margin: 16px 0 10px;
+    }
+
+    /* Avatar */
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+      background: linear-gradient(135deg, var(--sky), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-lg { width: 60px; height: 60px; font-size: 24px; }
+    .avatar-sm { width: 36px; height: 36px; font-size: 14px; }
+
+    /* Star rating */
+    .stars { color: var(--gold); font-size: 13px; }
+
+    /* Badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .badge-green { background: #D1FAE5; color: #065F46; }
+    .badge-orange { background: #FEF3C7; color: #92400E; }
+    .badge-red { background: #FEE2E2; color: #991B1B; }
+    .badge-blue { background: #DBEAFE; color: #1E40AF; }
+    .badge-navy { background: var(--navy); color: white; }
+    .badge-sky { background: var(--lsky); color: var(--navy); }
+
+    /* Primary button */
+    .btn-primary {
+      width: 100%; padding: 16px;
+      background: var(--navy2); color: white;
+      border: none; border-radius: 14px;
+      font-size: 15px; font-weight: 700; font-family: 'Inter',sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary:hover { background: #162b4a; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* Chip */
+    .chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+      border: 1px solid var(--border); background: white; color: var(--text);
+      cursor: pointer;
+    }
+    .chip.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+    /* Tag row */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; color: var(--muted); background: #F1F5F9;
+    }
+
+    /* Progress circle */
+    .progress-circle-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px 0;
+    }
+    .progress-ring { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: #E8EDF5; stroke-width: 10; }
+    .ring-fill {
+      fill: none; stroke: var(--navy); stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .ring-label {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      text-align: center;
+    }
+    .ring-number { font-size: 28px; font-weight: 900; color: var(--navy); line-height: 1; }
+    .ring-sub    { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .ring-badge  {
+      margin-top: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      background: var(--lsky); color: var(--navy);
+      font-size: 11px; font-weight: 700;
+    }
+
+    /* Bar chart (driver stats) */
+    .bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 60px; margin: 8px 0; }
+    .bar-col {
+      flex: 1; border-radius: 4px 4px 0 0;
+      background: var(--navy);
+      transition: height 1s ease;
+    }
+    .bar-col.dim { background: var(--border); }
+    .bar-col.current { background: var(--sky); }
+
+    /* Slider */
+    .slider-row { margin-bottom: 20px; }
+    .slider-q { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+    .slider-track {
+      position: relative; height: 36px; display: flex; align-items: center;
+    }
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px;
+      background: linear-gradient(to right, var(--navy) var(--val, 60%), #E8EDF5 var(--val, 60%));
+      border-radius: 4px; outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      background: var(--navy); border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .slider-labels {
+      display: flex; justify-content: space-between;
+      font-size: 9px; color: var(--muted); margin-top: 2px;
+    }
+
+    /* Metric card */
+    .metric-card {
+      background: var(--appbg); border-radius: 12px; padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .metric-icon { font-size: 22px; }
+    .metric-label { font-size: 11px; color: var(--muted); }
+    .metric-value { font-size: 20px; font-weight: 800; color: var(--navy); }
+
+    /* Voucher card */
+    .voucher-card {
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .voucher-img { width: 100%; height: 80px; object-fit: cover; background: linear-gradient(135deg, #1E3A5F, #0EA5E9); display:flex; align-items:center; justify-content:center; font-size:32px; }
+    .voucher-body { padding: 10px 12px; }
+    .voucher-name { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .voucher-price { font-size: 16px; font-weight: 900; color: var(--navy); }
+    .voucher-pts { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+
+    /* Journey timeline */
+    .timeline { padding: 0; }
+    .tl-item { display: flex; gap: 12px; margin-bottom: 0; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; width: 16px; }
+    .tl-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--navy); border: 2px solid white; box-shadow: 0 0 0 2px var(--navy); flex-shrink: 0; margin-top: 4px; }
+    .tl-line { flex: 1; width: 2px; background: var(--border); margin: 2px 0; min-height: 20px; }
+    .tl-right { flex: 1; padding-bottom: 16px; }
+    .tl-time { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .tl-place { font-size: 14px; color: var(--text); }
+    .tl-lbl { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Ride result card */
+    .ride-card {
+      background: white; border-radius: 16px; padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .ride-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .ride-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .ride-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .ride-rating { font-size: 12px; color: var(--muted); }
+    .ride-price { margin-left: auto; font-size: 18px; font-weight: 900; color: var(--navy); }
+    .ride-seat { font-size: 11px; font-weight: 700; }
+    .ride-route { margin-bottom: 8px; }
+    .ride-loc { font-size: 13px; color: var(--text); display: flex; gap: 8px; align-items: center; }
+    .ride-loc .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--navy); flex-shrink: 0; }
+    .ride-loc .line-v { width: 1px; height: 14px; background: var(--border); margin: 1px 0 1px 3px; }
+
+    /* Input field */
+    .input-wrap {
+      background: white; border-radius: 12px; padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .input-wrap.focused { border-color: var(--sky); }
+    .input-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .input-val { font-size: 15px; font-weight: 600; color: var(--text); }
+    .input-placeholder { font-size: 14px; color: var(--muted); }
+    .input-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* Swap btn */
+    .swap-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--navy); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(30,58,95,0.3);
+      margin: -4px auto; position: relative; z-index: 5;
+    }
+
+    /* Quick action grid */
+    .quick-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
+    .quick-item {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      cursor: pointer; padding: 8px 4px;
+    }
+    .quick-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: var(--appbg); border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+      transition: all 0.2s;
+    }
+    .quick-item:hover .quick-icon { background: var(--lsky); border-color: var(--sky); }
+    .quick-label { font-size: 11px; font-weight: 600; color: var(--muted); text-align: center; }
+
+    /* Points banner */
+    .pts-banner {
+      background: var(--navy); border-radius: 16px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .pts-icon { font-size: 28px; }
+    .pts-num { font-size: 20px; font-weight: 900; color: white; line-height: 1; }
+    .pts-sub { font-size: 12px; color: rgba(255,255,255,0.7); }
+    .pts-arr { color: rgba(255,255,255,0.5); font-size: 18px; margin-left: auto; }
+
+    /* Upcoming trip card */
+    .trip-mini {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .trip-mini-info { flex: 1; }
+    .trip-mini-route { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .trip-mini-date  { font-size: 12px; color: var(--muted); }
+    .trip-mini-with  { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+
+    /* Campus card */
+    .campus-card {
+      border-radius: 16px; overflow: hidden; position: relative; height: 100px; margin-bottom: 12px;
+      background: linear-gradient(135deg, #1E3A5F, #0EA5E9);
+      display: flex; align-items: flex-end; cursor: pointer;
+    }
+    .campus-card-text { padding: 12px; color: white; }
+    .campus-card-title { font-size: 15px; font-weight: 800; }
+    .campus-card-sub   { font-size: 12px; opacity: 0.8; }
+    .campus-plus {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 20px;
+    }
+
+    /* FAB */
+    .fab {
+      position: absolute; bottom: 70px; right: 16px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--navy); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; cursor: pointer; z-index: 20;
+      box-shadow: 0 4px 16px rgba(30,58,95,0.4);
+      transition: all 0.2s;
+    }
+    .fab:hover { transform: scale(1.1); }
+
+    /* Profile header */
+    .profile-header {
+      background: white; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; border-bottom: 1px solid var(--border);
+    }
+    .profile-name { font-size: 18px; font-weight: 800; color: var(--navy); }
+    .profile-sub  { font-size: 13px; color: var(--muted); }
+    .profile-badges { display: flex; gap: 8px; }
+
+    /* "See all" link */
+    .see-all { font-size: 13px; font-weight: 600; color: var(--sky); cursor: pointer; }
+
+    /* Benefits list */
+    .benefits-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); }
+    .benefits-item:last-child { border-bottom: none; }
+    .benefit-icon { font-size: 16px; }
+    .benefit-lock { opacity: 0.4; }
+
+    /* Earnings card */
+    .earn-card {
+      display: flex; gap: 8px;
+    }
+    .earn-item {
+      flex: 1; border-radius: 14px; padding: 14px; 
+    }
+    .earn-item.primary { background: var(--navy); }
+    .earn-item.secondary { background: var(--lsky); border: 1px solid #BFDBFE; }
+    .earn-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .earn-pts   { font-size: 22px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+    .earn-desc  { font-size: 12px; line-height: 1.4; }
+    .earn-item.primary .earn-label { color: rgba(255,255,255,0.6); }
+    .earn-item.primary .earn-pts   { color: white; }
+    .earn-item.primary .earn-desc  { color: rgba(255,255,255,0.75); }
+    .earn-item.secondary .earn-label { color: var(--muted); }
+    .earn-item.secondary .earn-pts   { color: var(--navy); }
+    .earn-item.secondary .earn-desc  { color: var(--muted); }
+
+    /* Standard ride earning */
+    .std-earn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; background: white; border-radius: 14px;
+      border: 1.5px solid var(--border); margin-bottom: 12px;
+    }
+    .std-earn-left { display: flex; align-items: center; gap: 12px; }
+    .std-earn-pts { background: var(--navy); color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .std-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .std-sub   { font-size: 12px; color: var(--muted); }
+
+    /* Cashback row */
+    .cashback-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; background: white; border-radius: 14px;
+      border: 1px solid var(--border); margin-bottom: 8px;
+    }
+    .cashback-icon { font-size: 24px; margin-right: 12px; }
+    .cashback-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .cashback-sub   { font-size: 12px; color: var(--muted); }
+    .cashback-btn   { background: var(--navy); color: white; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
+
+    /* Redeem header balance */
+    .balance-card {
+      background: var(--navy); color: white; border-radius: 16px;
+      padding: 20px; margin-bottom: 16px;
+    }
+    .balance-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6; }
+    .balance-pts   { font-size: 40px; font-weight: 900; line-height: 1.1; }
+    .balance-tier  { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+
+    /* Offer ride form */
+    .offer-section { margin-bottom: 16px; }
+    .offer-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .pref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .pref-item {
+      border-radius: 12px; padding: 12px; border: 2px solid var(--border);
+      background: white; cursor: pointer; transition: all 0.2s; text-align: center;
+    }
+    .pref-item.selected { border-color: var(--navy); background: var(--lsky); }
+    .pref-item .p-icon { font-size: 22px; margin-bottom: 6px; }
+    .pref-item .p-label { font-size: 12px; font-weight: 600; color: var(--text); }
+
+    /* Info box */
+    .info-box { display: flex; gap: 8px; background: #F1F5F9; border-radius: 12px; padding: 12px; margin: 8px 0; }
+    .info-box-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .info-box-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* Level card (gold tier) */
+    .level-card {
+      background: var(--navy); border-radius: 14px; padding: 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .level-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.6); }
+    .level-name  { font-size: 20px; font-weight: 900; color: white; }
+    .level-icon  { font-size: 32px; }
+
+    /* Weekly section */
+    .weekly-card { background: white; border-radius: 16px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); }
+    .weekly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .weekly-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .weekly-val   { font-size: 20px; font-weight: 900; color: var(--navy); display: flex; align-items: center; gap: 6px; }
+    .weekly-arrow { color: var(--green); font-size: 18px; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <a href="index.html" class="nav-logo">
+      <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+        <rect width="100" height="100" rx="20" fill="#1E3A5F"/>
+        <path d="M18 60 L25 44 L75 44 L82 60 L82 68 L18 68 Z" fill="white"/>
+        <path d="M28 44 L34 28 L66 28 L72 44" fill="white"/>
+        <circle cx="30" cy="68" r="7" fill="#0EA5E9"/>
+        <circle cx="70" cy="68" r="7" fill="#0EA5E9"/>
+        <path d="M36 44 L39 30 L61 30 L64 44 Z" fill="#1E3A5F"/>
+      </svg>
+      UniRide
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-btn home">🏠 Home</a>
+      <a href="presentation.html" class="nav-btn pres">📊 Slides</a>
+    </div>
+  </nav>
+
+  <!-- SCREEN NAVIGATOR -->
+  <div class="screen-nav" id="screenNav">
+    <div class="screen-nav-row">
+      <button class="nav-arrow" id="prevBtn" onclick="prevScreen()">&#8249;</button>
+      <div class="screen-label">
+        <span class="screen-label-name" id="screenLabelName">🏠 Home</span>
+        <span class="screen-label-num" id="screenLabelNum">1 / 12</span>
+      </div>
+      <button class="nav-arrow" id="nextBtn" onclick="nextScreen()">&#8250;</button>
+    </div>
+    <div class="screen-dots" id="screenDots"></div>
+  </div>
+
+  <!-- PHONE STAGE -->
+  <div class="phone-stage">
+    <div class="phone-scale-wrap" id="phoneScaleWrap">
+    <div class="phone-outer">
+      <div class="phone-inner">
+        <div class="notch"></div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 0: HOME (SOFIA)         -->
+        <!-- ============================== -->
+        <div class="screen active" id="screen-0">
+          <!-- Status bar -->
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="15" height="11" fill="currentColor"><path d="M7.5 2.5 C5 2.5 3 4 1.5 6 L0 4.5 C1.8 2.2 4.5 0.5 7.5 0.5 S13.2 2.2 15 4.5 L13.5 6 C12 4 10 2.5 7.5 2.5Z" opacity=".5"/><path d="M7.5 5 C6 5 4.5 5.8 3.5 7 L2 5.5 C3.3 4 5.3 3 7.5 3 S11.7 4 13 5.5 L11.5 7 C10.5 5.8 9 5 7.5 5Z" opacity=".8"/><path d="M7.5 7.5 C6.5 7.5 5.8 8 5 9 L7.5 11.5 L10 9 C9.2 8 8.5 7.5 7.5 7.5Z"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="17" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="menu-icon">☰</span>
+            <span class="brand">
+              <svg width="18" height="18" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="20" fill="#1E3A5F"/><path d="M18 60 L25 44 L75 44 L82 60 L82 68 L18 68 Z" fill="white"/><circle cx="30" cy="68" r="7" fill="#0EA5E9"/><circle cx="70" cy="68" r="7" fill="#0EA5E9"/></svg>
+              UniRide
+            </span>
+            <span class="notif">🔔</span>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:12px;">
+              <div style="margin-bottom:16px;">
+                <div style="font-size:22px;font-weight:900;color:var(--navy);">Hi Sofia 👋</div>
+                <div style="font-size:14px;color:var(--muted);">Where would you like to go?</div>
+              </div>
+
+              <!-- FROM/TO fields -->
+              <div class="input-wrap">
+                <span class="input-icon" style="color:var(--muted);">○</span>
+                <div>
+                  <div class="input-label">FROM</div>
+                  <div class="input-val">Geneva</div>
+                </div>
+              </div>
+              <div class="swap-btn" onclick="this.style.transform='rotate(180deg) scale(1.1)'; setTimeout(()=>this.style.transform='',400)">⇅</div>
+              <div class="input-wrap" style="margin-top:0;">
+                <span class="input-icon" style="color:var(--sky);">📍</span>
+                <div>
+                  <div class="input-label">TO</div>
+                  <div class="input-placeholder">Enter destination</div>
+                </div>
+              </div>
+
+              <button class="btn-primary" style="margin:12px 0;" onclick="goScreen(1)">
+                🔍 &nbsp; Search Rides
+              </button>
+
+              <!-- Quick actions -->
+              <div class="quick-grid">
+                <div class="quick-item" onclick="goScreen(1)">
+                  <div class="quick-icon">🔍</div>
+                  <span class="quick-label">Find a Ride</span>
+                </div>
+                <div class="quick-item" onclick="goScreen(7)">
+                  <div class="quick-icon">➕</div>
+                  <span class="quick-label">Offer a Ride</span>
+                </div>
+                <div class="quick-item">
+                  <div class="quick-icon">🗺️</div>
+                  <span class="quick-label">My Trips</span>
+                </div>
+                <div class="quick-item">
+                  <div class="quick-icon">💬</div>
+                  <span class="quick-label">Messages</span>
+                </div>
+              </div>
+
+              <!-- UniPoints banner -->
+              <div class="pts-banner" onclick="goScreen(3)">
+                <span class="pts-icon">🏆</span>
+                <div>
+                  <div class="pts-num">120 UniPoints</div>
+                  <div class="pts-sub">You're 30 points away from a free trip!</div>
+                </div>
+                <span class="pts-arr">›</span>
+              </div>
+
+              <!-- Upcoming Trip -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="sec-title" style="margin:0;">Upcoming Trip</span>
+                <span class="see-all">See all</span>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="goScreen(2)">
+                <div class="trip-mini">
+                  <div class="avatar avatar-sm">C</div>
+                  <div class="trip-mini-info">
+                    <div class="trip-mini-route">Geneva → Milan</div>
+                    <div class="trip-mini-date">Fri, 24 May &nbsp;·&nbsp; 18:00</div>
+                    <div class="trip-mini-with">🛡️ With Camille B.</div>
+                  </div>
+                  <span class="badge badge-navy">Booked</span>
+                </div>
+              </div>
+
+              <!-- Campus card -->
+              <div class="campus-card">
+                <div class="campus-card-text">
+                  <div class="campus-card-title">Connect with your campus</div>
+                  <div class="campus-card-sub">Join over 5,000 students commuting together.</div>
+                </div>
+                <div class="campus-plus">+</div>
+              </div>
+            </div>
+          </div>
+          <!-- Bottom nav -->
+          <div class="bottom-nav">
+            <div class="bnav-item active"><span class="bnav-icon">🏠</span>Home</div>
+            <div class="bnav-item" onclick="goScreen(1)"><span class="bnav-icon">🔍</span>Search</div>
+            <div class="bnav-item"><span class="bnav-icon">🚗</span>Trips</div>
+            <div class="bnav-item"><span class="bnav-icon">💬</span>Messages</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 1: SEARCH RESULTS       -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-1">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="15" height="11" fill="currentColor"><path d="M7.5 7.5 C6.5 7.5 5.8 8 5 9 L7.5 11.5 L10 9 C9.2 8 8.5 7.5 7.5 7.5Z"/><path d="M7.5 5 C6 5 4.5 5.8 3.5 7 L2 5.5 C3.3 4 5.3 3 7.5 3 S11.7 4 13 5.5 L11.5 7 C10.5 5.8 9 5 7.5 5Z" opacity=".8"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="back-btn" onclick="goScreen(0)">←</span>
+            <div>
+              <div style="font-size:16px;font-weight:800;color:var(--navy);">12 rides found</div>
+              <div style="font-size:12px;color:var(--muted);">Fri, 24 May</div>
+            </div>
+            <span style="font-size:20px;cursor:pointer;">⚙️</span>
+          </div>
+          <div class="scroll-area">
+            <div style="display:flex;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none;">
+              <span class="chip active">Price: Low to High ▾</span>
+              <span class="chip">Departure Time</span>
+              <span class="chip">Verified Drivers</span>
+            </div>
+            <div class="s-content" style="padding-top:4px;">
+              <!-- Ride 1 -->
+              <div class="ride-card" onclick="goScreen(2)">
+                <div class="ride-top">
+                  <div class="avatar avatar-sm">C</div>
+                  <div>
+                    <div class="ride-name">Camille B. ✔</div>
+                    <div class="ride-rating"><span class="stars">★</span> 4.8 (23 rides)</div>
+                  </div>
+                  <div style="margin-left:auto;text-align:right;">
+                    <div class="ride-price">CHF 12</div>
+                    <span class="badge badge-green">2 seats left</span>
+                  </div>
+                </div>
+                <div class="ride-route">
+                  <div class="tl-item" style="margin-bottom:4px;">
+                    <div class="tl-left"><div class="tl-dot"></div><div class="tl-line" style="min-height:14px;"></div></div>
+                    <div class="tl-right" style="padding-bottom:4px;">
+                      <span style="font-size:13px;font-weight:700;color:var(--muted);">18:00</span>
+                      <span style="font-size:13px;color:var(--text);margin-left:6px;">Geneva, Plainpalais</span>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left"><div class="tl-dot"></div></div>
+                    <div class="tl-right">
+                      <span style="font-size:13px;font-weight:700;color:var(--muted);">~20:45</span>
+                      <span style="font-size:13px;color:var(--text);margin-left:6px;">Milan, Lampugnano</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="tag-row" style="margin-top:8px;">
+                  <span class="tag">🔇 Quiet ride</span>
+                  <span class="tag">🚭 No smoking</span>
+                  <span class="tag">🚗 Tesla Model 3</span>
+                </div>
+              </div>
+              <!-- Ride 2 -->
+              <div class="ride-card">
+                <div class="ride-top">
+                  <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);">L</div>
+                  <div>
+                    <div class="ride-name">Luca R.</div>
+                    <div class="ride-rating"><span class="stars">★</span> 4.6 (12 rides)</div>
+                  </div>
+                  <div style="margin-left:auto;text-align:right;">
+                    <div class="ride-price">CHF 15</div>
+                    <span class="badge badge-blue">3 seats left</span>
+                  </div>
+                </div>
+                <div class="ride-route">
+                  <div class="tl-item" style="margin-bottom:4px;">
+                    <div class="tl-left"><div class="tl-dot"></div><div class="tl-line" style="min-height:14px;"></div></div>
+                    <div class="tl-right" style="padding-bottom:4px;">
+                      <span style="font-size:13px;font-weight:700;color:var(--muted);">19:30</span>
+                      <span style="font-size:13px;color:var(--text);margin-left:6px;">Geneva, Airport</span>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left"><div class="tl-dot"></div></div>
+                    <div class="tl-right">
+                      <span style="font-size:13px;font-weight:700;color:var(--muted);">~22:15</span>
+                      <span style="font-size:13px;color:var(--text);margin-left:6px;">Milan, Central Station</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="tag-row" style="margin-top:8px;">
+                  <span class="tag">🎵 Music OK</span>
+                  <span class="tag">🧳 Large luggage</span>
+                </div>
+              </div>
+              <!-- Ride 3 -->
+              <div class="ride-card">
+                <div class="ride-top">
+                  <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#F97316,#EF4444);">S</div>
+                  <div>
+                    <div class="ride-name">Sara M. ✔</div>
+                    <div class="ride-rating"><span class="stars">★</span> 4.9 (54 rides)</div>
+                  </div>
+                  <div style="margin-left:auto;text-align:right;">
+                    <div class="ride-price">CHF 10</div>
+                    <span class="badge badge-red">1 seat left</span>
+                  </div>
+                </div>
+                <div class="ride-route">
+                  <div class="tl-item" style="margin-bottom:4px;">
+                    <div class="tl-left"><div class="tl-dot"></div><div class="tl-line" style="min-height:14px;"></div></div>
+                    <div class="tl-right" style="padding-bottom:4px;">
+                      <span style="font-size:13px;font-weight:700;color:var(--muted);">20:00</span>
+                      <span style="font-size:13px;color:var(--text);margin-left:6px;">Geneva, Meyrin</span>
+                    </div>
+                  </div>
+                  <div class="tl-item">
+                    <div class="tl-left"><div class="tl-dot"></div></div>
+                    <div class="tl-right">
+                      <span style="font-size:13px;font-weight:700;color:var(--muted);">~22:30</span>
+                      <span style="font-size:13px;color:var(--text);margin-left:6px;">Milan, San Babila</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="tag-row" style="margin-top:8px;">
+                  <span class="tag">💬 Social rides</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fab" onclick="goScreen(7)">+</div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(0)"><span class="bnav-icon">🏠</span>Home</div>
+            <div class="bnav-item active"><span class="bnav-icon">🔍</span>Search</div>
+            <div class="bnav-item"><span class="bnav-icon">🚗</span>Trips</div>
+            <div class="bnav-item"><span class="bnav-icon">💬</span>Messages</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 2: TRIP DETAIL          -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-2">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="17" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="back-btn" onclick="goScreen(1)">←</span>
+            <span></span>
+            <div class="right-icons">
+              <span>⬆</span><span>♡</span>
+            </div>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:12px;">
+              <!-- Driver profile -->
+              <div class="profile-header" style="padding:0 0 16px; border-bottom:none;">
+                <div style="display:flex;gap:14px;width:100%;align-items:flex-start;">
+                  <div class="avatar avatar-lg">C</div>
+                  <div style="flex:1;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <div style="font-size:20px;font-weight:900;color:var(--navy);">Camille B.</div>
+                      <div style="font-size:14px;font-weight:700;color:var(--navy);">⭐ 4.8</div>
+                    </div>
+                    <div style="font-size:13px;color:var(--muted);margin:2px 0 8px;">Economics student at UNIGE</div>
+                    <div style="display:flex;gap:8px;">
+                      <span class="badge badge-blue">✔ Verified</span>
+                      <span class="badge badge-sky">23 rides</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Trip details -->
+              <div class="card">
+                <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:14px;">Trip details</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                  <span style="font-size:18px;">📅</span>
+                  <span style="font-size:14px;font-weight:600;color:var(--text);">Fri, 24 May &nbsp;·&nbsp; 18:00</span>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+                  <div class="tl-right">
+                    <div class="tl-lbl">PICKUP</div>
+                    <div class="tl-place">Geneva, Plainpalais</div>
+                  </div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-left"><div class="tl-dot" style="background:var(--sky);box-shadow:0 0 0 2px var(--sky);"></div></div>
+                  <div class="tl-right">
+                    <div class="tl-lbl">DROP-OFF</div>
+                    <div class="tl-place">Milan, Lampugnano</div>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;">⏱️ ~3h 30m</div>
+                  <div>
+                    <div style="font-size:11px;text-align:right;color:var(--muted);">Price per seat</div>
+                    <div style="font-size:20px;font-weight:900;color:var(--navy);">CHF 10.00</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- About ride -->
+              <div class="card">
+                <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">About this ride</div>
+                <div class="tag-row" style="margin-bottom:10px;">
+                  <span class="tag">🔇 Quiet ride</span>
+                  <span class="tag">🚭 No smoking</span>
+                  <span class="tag">🎵 Music OK</span>
+                </div>
+                <div style="font-size:13px;color:var(--muted);font-style:italic;line-height:1.5;">
+                  "Usually listen to chill music 🎵 Looking for polite passengers."
+                </div>
+              </div>
+
+              <!-- Car & seats -->
+              <div class="card">
+                <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:8px;">Car &amp; seats</div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="font-size:13px;color:var(--muted);">🚗 Tesla Model 3</span>
+                  <span style="font-size:13px;color:var(--muted);">2 seats available</span>
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="alert('Booking requested! 🎉')">
+                Request a seat
+              </button>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(0)"><span class="bnav-icon">🏠</span>Home</div>
+            <div class="bnav-item"><span class="bnav-icon">🔍</span>Search</div>
+            <div class="bnav-item active"><span class="bnav-icon">🚗</span>Trips</div>
+            <div class="bnav-item"><span class="bnav-icon">💬</span>Messages</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 3: PASSENGER REWARDS    -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-3">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="14" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="brand">
+              <svg width="18" height="18" viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="20" fill="#1E3A5F"/><path d="M18 60 L25 44 L75 44 L82 60 L82 68 L18 68 Z" fill="white"/><circle cx="30" cy="68" r="7" fill="#0EA5E9"/><circle cx="70" cy="68" r="7" fill="#0EA5E9"/></svg>
+              UniRide
+            </span>
+            <span class="notif">🔔</span>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:16px;">
+              <!-- Progress circle -->
+              <div class="progress-circle-wrap">
+                <div style="position:relative;width:160px;height:160px;">
+                  <svg class="progress-ring" width="160" height="160" viewBox="0 0 160 160">
+                    <circle class="ring-bg" cx="80" cy="80" r="65"/>
+                    <circle class="ring-fill" cx="80" cy="80" r="65"
+                      stroke-dasharray="408"
+                      stroke-dashoffset="204"
+                      id="ring-passenger"/>
+                  </svg>
+                  <div class="ring-label">
+                    <div class="ring-number" id="pts-passenger">0</div>
+                    <div class="ring-sub">OF 500 POINTS</div>
+                    <div class="ring-badge">Silver Member</div>
+                  </div>
+                </div>
+                <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:12px;">
+                  You are <strong style="color:var(--navy);">260 points</strong> away from unlocking <strong style="color:var(--navy);">Gold Tier</strong> benefits.
+                </p>
+              </div>
+
+              <!-- Standard earn -->
+              <div class="std-earn">
+                <div class="std-earn-left">
+                  <span style="font-size:22px;">⚡</span>
+                  <div>
+                    <div class="std-title">Standard Ride</div>
+                    <div class="std-sub">Earn points for every shared journey across campus.</div>
+                  </div>
+                </div>
+                <span class="std-earn-pts">+10 pts</span>
+              </div>
+
+              <!-- Bonus cards -->
+              <div class="earn-card" style="margin-bottom:16px;">
+                <div class="earn-item primary">
+                  <div class="earn-label">📅 WEEKLY BONUS</div>
+                  <div class="earn-pts">+15 pts</div>
+                  <div class="earn-desc">Complete 3 rides this week to claim.</div>
+                </div>
+                <div class="earn-item secondary">
+                  <div class="earn-label">👥 REFERRALS</div>
+                  <div class="earn-pts">+50 pts</div>
+                  <div class="earn-desc">Invite a classmate to join UniRide.</div>
+                </div>
+              </div>
+
+              <!-- Redeem rewards -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <span class="sec-title" style="margin:0;">Redeem Rewards</span>
+                <span class="see-all">View All</span>
+              </div>
+
+              <!-- Coffee reward -->
+              <div class="card" style="overflow:hidden;padding:0;">
+                <div style="height:80px;background:linear-gradient(135deg,#4A4A4A,#8B7355);display:flex;align-items:center;justify-content:center;font-size:40px;">☕</div>
+                <div style="padding:12px;">
+                  <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">CAMPUS CAFE</div>
+                  <div style="font-size:15px;font-weight:800;color:var(--navy);">Free Espresso</div>
+                  <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:2px;">🏆 120 pts</div>
+                </div>
+              </div>
+
+              <!-- Benefits -->
+              <div class="card" style="background:var(--lsky);border:1px solid #BFDBFE;">
+                <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">Your Benefits</div>
+                <div class="benefits-item"><span class="benefit-icon">✅</span> Priority matching during peak hours</div>
+                <div class="benefits-item"><span class="benefit-icon">✅</span> Access to exclusive weekend routes</div>
+                <div class="benefits-item benefit-lock"><span class="benefit-icon">🔒</span> Zero cancellation fees (Gold only)</div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(0)"><span class="bnav-icon">🏠</span>HOME</div>
+            <div class="bnav-item" onclick="goScreen(1)"><span class="bnav-icon">🔍</span>SEARCH</div>
+            <div class="bnav-item"><span class="bnav-icon">🚗</span>TRIPS</div>
+            <div class="bnav-item active" style="color:var(--sky);"><span class="bnav-icon">⭐</span>REWARDS</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>PROFILE</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 4: DRIVER DASHBOARD     -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-4">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="19" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="menu-icon">☰</span>
+            <span class="brand">UniRide Driver</span>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#0EA5E9,#2563EB);">J</div>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:12px;">
+              <div style="margin-bottom:12px;">
+                <div style="font-size:22px;font-weight:900;color:var(--navy);">Welcome back, Julien</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                  <span style="color:var(--green);font-size:16px;">⭐</span>
+                  <span style="font-size:13px;font-weight:700;color:var(--green);">Gold Tier Status</span>
+                </div>
+              </div>
+
+              <!-- Points card with circle -->
+              <div class="card" style="text-align:center;padding:20px 16px;">
+                <div style="position:relative;width:140px;height:140px;margin:0 auto 12px;">
+                  <svg class="progress-ring" width="140" height="140" viewBox="0 0 140 140">
+                    <circle class="ring-bg" cx="70" cy="70" r="56"/>
+                    <circle class="ring-fill" cx="70" cy="70" r="56"
+                      stroke-dasharray="352"
+                      stroke-dashoffset="35"
+                      id="ring-driver"/>
+                  </svg>
+                  <div class="ring-label">
+                    <div class="ring-number" id="pts-driver">0</div>
+                    <div class="ring-sub">/ 500 Points</div>
+                  </div>
+                </div>
+                <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">10 points per ride. <strong style="color:var(--navy);">20 points</strong> until next reward!</div>
+                <button class="btn-primary" onclick="goScreen(5)">View Rewards</button>
+              </div>
+
+              <!-- Gold tier badge -->
+              <div class="level-card">
+                <div>
+                  <div class="level-label">CURRENT LEVEL</div>
+                  <div class="level-name">Gold Tier Partner</div>
+                </div>
+                <div class="level-icon">🏅</div>
+              </div>
+
+              <!-- Weekly activity -->
+              <div class="weekly-card">
+                <div class="weekly-header">
+                  <span class="weekly-label">WEEKLY ACTIVITY</span>
+                </div>
+                <div class="weekly-val">
+                  +12% vs last week
+                  <span class="weekly-arrow">↗</span>
+                </div>
+                <div class="bar-chart" id="driver-bars">
+                  <div class="bar-col" style="height:55%;"></div>
+                  <div class="bar-col" style="height:65%;"></div>
+                  <div class="bar-col" style="height:70%;"></div>
+                  <div class="bar-col" style="height:75%;"></div>
+                  <div class="bar-col" style="height:80%;"></div>
+                  <div class="bar-col" style="height:95%;"></div>
+                  <div class="bar-col current" style="height:100%;"></div>
+                  <div class="bar-col dim" style="height:20%;"></div>
+                </div>
+              </div>
+
+              <!-- Performance metrics -->
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">PERFORMANCE METRICS</div>
+              <div class="metric-card">
+                <span class="metric-icon">🚗</span>
+                <div>
+                  <div class="metric-label">Rides/Month</div>
+                  <div class="metric-value" id="rides-month">0</div>
+                </div>
+              </div>
+              <div class="metric-card">
+                <span class="metric-icon">✅</span>
+                <div>
+                  <div class="metric-label">Completion</div>
+                  <div class="metric-value" id="completion-pct">0%</div>
+                </div>
+              </div>
+              <div class="metric-card">
+                <span class="metric-icon">❌</span>
+                <div>
+                  <div class="metric-label">Cancellations</div>
+                  <div class="metric-value">2%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item"><span class="bnav-icon">📊</span>Dashboard</div>
+            <div class="bnav-item"><span class="bnav-icon">📈</span>Activity</div>
+            <div class="bnav-item active" style="color:var(--sky);"><span class="bnav-icon">⭐</span>Rewards</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 5: REDEEM POINTS        -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-5">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="20" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="menu-icon">☰</span>
+            <span class="brand">Redeem Points</span>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#0EA5E9,#2563EB);">J</div>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:12px;">
+              <!-- Balance card -->
+              <div class="balance-card">
+                <div class="balance-label">YOUR BALANCE</div>
+                <div class="balance-pts">480 Points</div>
+                <div class="balance-tier">⭐ Gold Tier Partner</div>
+              </div>
+
+              <!-- Fuel Vouchers -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="sec-title" style="margin:0;">Fuel Vouchers</span>
+                <span style="font-size:16px;">⛽</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+                <div class="voucher-card" style="cursor:pointer;">
+                  <div class="voucher-img">⛽</div>
+                  <div class="voucher-body">
+                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Migrol</div>
+                    <div class="voucher-price">CHF 20 Voucher</div>
+                    <div class="voucher-pts">🏆 200 pts &nbsp;›</div>
+                  </div>
+                </div>
+                <div class="voucher-card" style="cursor:pointer;">
+                  <div class="voucher-img">🏪</div>
+                  <div class="voucher-body">
+                    <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Coop Pronto</div>
+                    <div class="voucher-price">CHF 50 Voucher</div>
+                    <div class="voucher-pts">🏆 450 pts &nbsp;›</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cash Back -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="sec-title" style="margin:0;">Cash Back</span>
+                <span style="font-size:12px;color:var(--green);font-weight:700;">🌱 Ideal for EV</span>
+              </div>
+              <div class="cashback-row">
+                <span class="cashback-icon">💳</span>
+                <div style="flex:1;">
+                  <div class="cashback-title">CHF 10 Cash to Account</div>
+                  <div class="cashback-sub">Direct bank transfer</div>
+                </div>
+                <span class="cashback-btn">100 pts</span>
+              </div>
+              <div class="cashback-row">
+                <span class="cashback-icon">💳</span>
+                <div style="flex:1;">
+                  <div class="cashback-title">CHF 25 Cash to Account</div>
+                  <div class="cashback-sub">Direct bank transfer</div>
+                </div>
+                <span class="cashback-btn">240 pts</span>
+              </div>
+
+              <div class="info-box" style="margin-top:8px;">
+                <span class="info-box-icon">ℹ️</span>
+                <span class="info-box-text">Vouchers valid at participating Swiss gas stations.</span>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item"><span class="bnav-icon">📊</span>Dashboard</div>
+            <div class="bnav-item"><span class="bnav-icon">📈</span>Activity</div>
+            <div class="bnav-item active" style="color:var(--sky);"><span class="bnav-icon">🎁</span>Rewards</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 6: DRIVER QUESTIONNAIRE -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-6">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="15" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="menu-icon">☰</span>
+            <span class="brand">Driver Questionnaire</span>
+            <span class="notif">🔔</span>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:0;padding-left:0;padding-right:0;">
+              <!-- Banner -->
+              <div style="background:linear-gradient(135deg,#1E3A5F,#2563EB);padding:20px 16px 24px;margin-bottom:8px;">
+                <div style="font-size:20px;font-weight:900;color:white;margin-bottom:6px;">Help us tailor your ride.</div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.75);">Your preferences help UniRide match you with the perfect commute.</div>
+              </div>
+              <div style="padding:0 16px 80px;">
+                <div id="slider-questions"></div>
+                <button class="btn-primary" onclick="alert('Questionnaire submitted! Thank you, Julien 🎉')">
+                  SUBMIT QUESTIONNAIRE
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(4)"><span class="bnav-icon">📊</span>Dashboard</div>
+            <div class="bnav-item"><span class="bnav-icon">📈</span>Activity</div>
+            <div class="bnav-item"><span class="bnav-icon">⭐</span>Rewards</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 7: OFFER A RIDE         -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-7">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="19" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="back-btn" onclick="goScreen(0)">←</span>
+            <span class="brand">Offer a Ride</span>
+            <span></span>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:12px;">
+              <div class="offer-section">
+                <div class="offer-label">Route</div>
+                <div class="input-wrap" style="border-color:var(--sky);">
+                  <span class="input-icon">📍</span>
+                  <div>
+                    <div class="input-label">FROM</div>
+                    <div class="input-val">Lausanne, Centre</div>
+                  </div>
+                </div>
+                <div class="swap-btn">⇅</div>
+                <div class="input-wrap" style="margin-top:0;">
+                  <span class="input-icon" style="color:var(--sky);">📍</span>
+                  <div>
+                    <div class="input-label">TO</div>
+                    <div class="input-val">Geneva, Plainpalais</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="offer-section">
+                <div class="offer-label">Date &amp; Time</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="input-wrap">
+                    <span class="input-icon">📅</span>
+                    <div>
+                      <div class="input-label">DATE</div>
+                      <div class="input-val">Fri, 24 May</div>
+                    </div>
+                  </div>
+                  <div class="input-wrap">
+                    <span class="input-icon">⏰</span>
+                    <div>
+                      <div class="input-label">TIME</div>
+                      <div class="input-val">08:00</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="offer-section">
+                <div class="offer-label">Seats &amp; Price</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="input-wrap">
+                    <span class="input-icon">💺</span>
+                    <div>
+                      <div class="input-label">SEATS</div>
+                      <div class="input-val">3 seats</div>
+                    </div>
+                  </div>
+                  <div class="input-wrap" style="border-color:var(--sky);">
+                    <span class="input-icon">💰</span>
+                    <div>
+                      <div class="input-label">PRICE/SEAT</div>
+                      <div class="input-val">CHF 12</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="offer-section">
+                <div class="offer-label">Ride preferences</div>
+                <div class="pref-grid">
+                  <div class="pref-item selected">
+                    <div class="p-icon">🔇</div>
+                    <div class="p-label">Quiet ride</div>
+                  </div>
+                  <div class="pref-item">
+                    <div class="p-icon">🎵</div>
+                    <div class="p-label">Music OK</div>
+                  </div>
+                  <div class="pref-item selected">
+                    <div class="p-icon">🚭</div>
+                    <div class="p-label">No smoking</div>
+                  </div>
+                  <div class="pref-item">
+                    <div class="p-icon">🐾</div>
+                    <div class="p-label">Pets OK</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="info-box">
+                <span class="info-box-icon">⚡</span>
+                <span class="info-box-text">You'll earn <strong>+10 UniPoints</strong> for every passenger on this ride!</span>
+              </div>
+
+              <button class="btn-primary" style="margin-top:8px;" onclick="alert('Ride posted! 🚗 Your ride is now visible to students. +10 pts per passenger! 🎉')">
+                🚗 &nbsp; Post Ride
+              </button>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(0)"><span class="bnav-icon">🏠</span>Home</div>
+            <div class="bnav-item"><span class="bnav-icon">🔍</span>Search</div>
+            <div class="bnav-item active"><span class="bnav-icon">🚗</span>Trips</div>
+            <div class="bnav-item"><span class="bnav-icon">💬</span>Messages</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 8: CHAT WITH DRIVER     -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-8">
+          <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg><svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1.2"/></svg></div></div>
+          <div class="app-header" style="padding-bottom:10px;">
+            <span class="back-btn" onclick="goScreen(2)">←</span>
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:15px;font-weight:800;color:var(--navy);">Camille B.</div>
+              <div style="font-size:12px;color:var(--green);font-weight:600;">● Online</div>
+            </div>
+            <span style="font-size:18px;cursor:pointer;color:var(--muted);">⋯</span>
+          </div>
+          <div style="background:var(--lsky);margin:0 16px 10px;border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:center;">
+            <span style="font-size:16px;">📍</span>
+            <div style="font-size:12px;color:var(--navy);line-height:1.4;"><strong>Before booking</strong> — Chat with the driver to confirm details.</div>
+          </div>
+          <div class="scroll-area" style="background:#F8FAFF;">
+            <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;gap:8px;align-items:flex-end;">
+                <div class="avatar avatar-sm" style="flex-shrink:0;margin-bottom:2px;">C</div>
+                <div>
+                  <div style="background:white;border-radius:16px 16px 16px 4px;padding:10px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.08);max-width:210px;">
+                    <div style="font-size:13px;color:var(--text);line-height:1.5;">Hi Sofia! 👋 Looking forward to sharing the ride.</div>
+                  </div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;padding-left:4px;">16:42</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <div>
+                  <div style="background:var(--navy);border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:210px;">
+                    <div style="font-size:13px;color:white;line-height:1.5;">Hi! Is the pickup time flexible?</div>
+                  </div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;text-align:right;padding-right:4px;">16:43 ✓✓</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:flex-end;">
+                <div class="avatar avatar-sm" style="flex-shrink:0;margin-bottom:2px;">C</div>
+                <div>
+                  <div style="background:white;border-radius:16px 16px 16px 4px;padding:10px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.08);max-width:210px;">
+                    <div style="font-size:13px;color:var(--text);line-height:1.5;">Yes, within 15 min is okay 😊</div>
+                  </div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;padding-left:4px;">16:44</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <div>
+                  <div style="background:var(--navy);border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:210px;">
+                    <div style="font-size:13px;color:white;line-height:1.5;">Perfect! I'll be at Plainpalais at 18:00 sharp. 👍</div>
+                  </div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:3px;text-align:right;padding-right:4px;">16:45 ✓✓</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:8px 12px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;border-top:1px solid var(--border);background:white;">
+            <span class="chip" style="white-space:nowrap;">Running late</span>
+            <span class="chip" style="white-space:nowrap;">Pickup info</span>
+            <span class="chip" style="white-space:nowrap;">Luggage</span>
+          </div>
+          <div style="padding:8px 12px;background:white;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);">
+            <div style="flex:1;background:var(--appbg);border-radius:22px;padding:10px 16px;font-size:13px;color:var(--muted);">Type a message…</div>
+            <div style="width:36px;height:36px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;cursor:pointer;">➤</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 9: TRIP IN PROGRESS     -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-9">
+          <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg><svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1.2"/></svg></div></div>
+          <div style="text-align:center;padding:18px 16px 10px;background:white;border-bottom:1px solid var(--border);">
+            <div style="font-size:18px;font-weight:900;color:var(--navy);">On the way</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px;">Arriving in <strong style="color:var(--sky);">1h 05m</strong></div>
+          </div>
+          <div style="background:#E8F4F8;display:flex;align-items:center;justify-content:center;height:180px;position:relative;overflow:hidden;">
+            <svg width="340" height="180" viewBox="0 0 340 180" style="position:absolute;inset:0;">
+              <path d="M60 150 Q120 110 160 90 Q200 70 240 50 Q280 30 300 20" stroke="#CBD5E1" stroke-width="16" fill="none" stroke-linecap="round"/>
+              <path d="M60 150 Q120 110 160 90 Q200 70 240 50 Q280 30 300 20" stroke="white" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="16 10"/>
+              <path d="M60 150 Q120 110 160 90 Q180 80 200 72" stroke="#0EA5E9" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="60" cy="150" r="8" fill="#0EA5E9"/><circle cx="60" cy="150" r="4" fill="white"/>
+              <circle cx="300" cy="20" r="8" fill="#1E3A5F"/><circle cx="300" cy="20" r="4" fill="white"/>
+              <text x="200" y="77" text-anchor="middle" font-size="18">🚗</text>
+            </svg>
+          </div>
+          <div style="background:white;border-radius:20px 20px 0 0;padding:16px;margin-top:-10px;">
+            <div class="timeline" style="margin-bottom:14px;">
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot" style="background:var(--sky);"></div><div class="tl-line"></div></div>
+                <div class="tl-right"><div class="tl-lbl">PICKUP</div><div class="tl-place">Geneva, Plainpalais</div><div class="tl-time">18:00</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-left"><div class="tl-dot"></div></div>
+                <div class="tl-right"><div class="tl-lbl">DROP-OFF (EST.)</div><div class="tl-place">Milan, Lampugnano</div><div class="tl-time">~21:30</div></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+              <button class="btn-primary" style="font-size:12px;padding:10px;">📤 Share trip</button>
+              <button style="background:#FEE2E2;color:#991B1B;border:none;border-radius:12px;font-size:12px;font-weight:700;padding:10px;cursor:pointer;">🚨 Emergency</button>
+            </div>
+            <div style="background:var(--appbg);border-radius:12px;padding:12px;text-align:center;">
+              <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;">How's everything going?</div>
+              <div style="display:flex;gap:12px;justify-content:center;font-size:24px;">
+                <span style="cursor:pointer;" title="Great!">😊</span>
+                <span style="cursor:pointer;" title="Okay">😐</span>
+                <span style="cursor:pointer;" title="Issues" onclick="goScreen(10)">😟</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 10: RATE AND REVIEW     -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-10">
+          <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg><svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1.2"/></svg></div></div>
+          <div class="app-header">
+            <span class="back-btn" onclick="goScreen(9)">←</span>
+            <div><div style="font-size:15px;font-weight:800;color:var(--navy);">Trip completed</div><div style="font-size:12px;color:var(--muted);">Fri, 24 May · Geneva → Milan</div></div>
+            <span></span>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:16px;">
+              <div class="card" style="text-align:center;margin-bottom:14px;">
+                <div class="avatar" style="margin:0 auto 10px;width:56px;height:56px;font-size:24px;">C</div>
+                <div style="font-size:15px;font-weight:800;color:var(--navy);">How was your trip with Camille?</div>
+                <div style="display:flex;justify-content:center;gap:10px;margin:14px 0;font-size:28px;" id="starRow">
+                  <span onclick="rateTrip(1)" style="cursor:pointer;color:#D1D5DB;">★</span>
+                  <span onclick="rateTrip(2)" style="cursor:pointer;color:#D1D5DB;">★</span>
+                  <span onclick="rateTrip(3)" style="cursor:pointer;color:#D1D5DB;">★</span>
+                  <span onclick="rateTrip(4)" style="cursor:pointer;color:#D1D5DB;">★</span>
+                  <span onclick="rateTrip(5)" style="cursor:pointer;color:#D1D5DB;">★</span>
+                </div>
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;">Would you ride with Camille again?</div>
+                <div style="display:flex;gap:10px;justify-content:center;">
+                  <button onclick="this.style.background='var(--navy)';this.style.color='white';" style="flex:1;max-width:100px;background:var(--appbg);border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;">Yes</button>
+                  <button onclick="this.style.background='#FEE2E2';this.style.color='#991B1B';" style="flex:1;max-width:100px;background:var(--appbg);border:1.5px solid var(--border);border-radius:10px;padding:8px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;">No</button>
+                </div>
+              </div>
+              <div class="card" style="margin-bottom:14px;">
+                <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">What did you like?</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <span class="chip" onclick="this.classList.toggle('active')">Safe</span>
+                  <span class="chip" onclick="this.classList.toggle('active')">Friendly</span>
+                  <span class="chip" onclick="this.classList.toggle('active')">On time</span>
+                  <span class="chip" onclick="this.classList.toggle('active')">Comfortable</span>
+                  <span class="chip" onclick="this.classList.toggle('active')">Good communication</span>
+                  <span class="chip" onclick="this.classList.toggle('active')">Car was clean</span>
+                </div>
+              </div>
+              <div class="card" style="margin-bottom:14px;">
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">Write a comment (optional)</div>
+                <textarea style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;color:var(--text);resize:none;height:80px;outline:none;box-sizing:border-box;" placeholder="Great driver, very communicative…"></textarea>
+              </div>
+              <button class="btn-primary" onclick="submitReview()">✓ &nbsp;Submit Review</button>
+              <div style="height:16px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 11: PROFILE             -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-11">
+          <div class="status-bar"><span class="time">9:41</span><div class="status-icons"><svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg><svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="18" height="7" rx="1.2"/></svg></div></div>
+          <div class="app-header">
+            <span style="font-size:18px;color:var(--muted);">⚙️</span>
+            <div style="font-size:16px;font-weight:800;color:var(--navy);">My Profile</div>
+            <span style="font-size:18px;color:var(--muted);">✏️</span>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:8px;">
+              <div style="text-align:center;margin-bottom:16px;">
+                <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--blue));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:white;margin:0 auto 10px;box-shadow:0 4px 16px rgba(14,165,233,0.35);">S</div>
+                <div style="font-size:18px;font-weight:900;color:var(--navy);">Sofia Martini</div>
+                <div style="font-size:13px;color:var(--muted);">Economics student · UNIGE</div>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+                  <span class="badge badge-navy" style="font-size:11px;padding:4px 10px;">✔ Verified</span>
+                  <span class="badge" style="background:var(--lsky);color:var(--navy);font-size:11px;padding:4px 10px;">⭐ 4.9 (12 trips)</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+                <div class="stat-card" style="padding:12px;"><div style="font-size:20px;font-weight:900;color:var(--sky);">12</div><div style="font-size:11px;color:var(--muted);">Trips</div></div>
+                <div class="stat-card" style="padding:12px;"><div style="font-size:20px;font-weight:900;color:var(--navy);">120</div><div style="font-size:11px;color:var(--muted);">Points</div></div>
+                <div class="stat-card" style="padding:12px;"><div style="font-size:20px;font-weight:900;color:var(--blue);">🥈</div><div style="font-size:11px;color:var(--muted);">Silver</div></div>
+              </div>
+              <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;">
+                  <span style="font-size:18px;">🚗</span><span style="font-size:14px;font-weight:600;color:var(--text);flex:1;">My Trip History</span><span style="color:var(--muted);">›</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;" onclick="goScreen(3)">
+                  <span style="font-size:18px;">🏆</span><span style="font-size:14px;font-weight:600;color:var(--text);flex:1;">UniPoints &amp; Rewards</span><span style="color:var(--muted);">›</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;">
+                  <span style="font-size:18px;">🔒</span><span style="font-size:14px;font-weight:600;color:var(--text);flex:1;">Privacy &amp; Safety</span><span style="color:var(--muted);">›</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;">
+                  <span style="font-size:18px;">📋</span><span style="font-size:14px;font-weight:600;color:var(--text);flex:1;">Preferences Survey</span><span style="background:var(--sky);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">NEW</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;">
+                  <span style="font-size:18px;">❓</span><span style="font-size:14px;font-weight:600;color:var(--text);flex:1;">Help &amp; Support</span><span style="color:var(--muted);">›</span>
+                </div>
+              </div>
+              <div style="background:var(--navy);border-radius:16px;padding:14px 16px;display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+                <span style="font-size:28px;">🎓</span>
+                <div>
+                  <div style="font-size:13px;font-weight:800;color:white;">UNIGE — Verified Student</div>
+                  <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px;">sofia.martini@etu.unige.ch</div>
+                </div>
+              </div>
+              <div style="height:16px;"></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(0)"><span class="bnav-icon">🏠</span>Home</div>
+            <div class="bnav-item" onclick="goScreen(1)"><span class="bnav-icon">🔍</span>Search</div>
+            <div class="bnav-item"><span class="bnav-icon">🚗</span>Trips</div>
+            <div class="bnav-item"><span class="bnav-icon">💬</span>Messages</div>
+            <div class="bnav-item active"><span class="bnav-icon">👤</span>Profile</div>
+          </div>
+        </div>
+
+      </div><!-- /phone-inner -->
+    </div><!-- /phone-outer -->
+    </div><!-- /phone-scale-wrap -->
+  </div><!-- /phone-stage -->
+
+  <script>
+    // ============== RESPONSIVE PHONE SCALE ==============
+    function scalePhone() {
+      const selector = document.querySelector('.screen-nav');
+      const stage    = document.querySelector('.phone-stage');
+      const wrap     = document.getElementById('phoneScaleWrap');
+
+      // How far down the selector bar ends
+      const topBound = selector.getBoundingClientRect().bottom + 10;
+      stage.style.top = topBound + 'px';
+
+      const availH = window.innerHeight - topBound - 10; // 10px bottom air
+      const availW = window.innerWidth  - 32;            // 16px each side
+
+      const phoneH = 796; // 780 outer height + 8px top + 8px bottom padding
+      const phoneW = 391; // 375 outer width  + 8px left + 8px right padding
+
+      const scale = Math.min(1, availH / phoneH, availW / phoneW);
+      wrap.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', scalePhone);
+    // Fire on load (fonts/layout settled) AND immediately as fallback
+    window.addEventListener('load', scalePhone);
+    setTimeout(scalePhone, 50);
+
+    // ============== RATING & REVIEW ==============
+    function rateTrip(val) {
+      const stars = document.querySelectorAll('#starRow span');
+      stars.forEach((s, i) => { s.style.color = i < val ? '#F59E0B' : '#D1D5DB'; });
+    }
+    function submitReview() {
+      alert('Review submitted! +5 UniPoints earned 🎉');
+      goScreen(0);
+    }
+
+    // ============== SCREEN NAVIGATION ==============
+    const screens = document.querySelectorAll('.screen');
+    let currentScreen = 0;
+
+    const screenNames = ['🏠 Home','🔍 Search','🚗 Trip','⭐ Rewards','🏆 Driver','🎁 Redeem','📋 Survey','➕ Offer','💬 Chat','🗺️ Live','⭐ Review','👤 Profile'];
+    const TOTAL = screens.length;
+
+    // Build dots
+    const dotsEl = document.getElementById('screenDots');
+    screenNames.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'screen-dot' + (i === 0 ? ' active' : '');
+      d.onclick = () => goScreen(i);
+      dotsEl.appendChild(d);
+    });
+
+    function updateNav() {
+      document.getElementById('screenLabelName').textContent = screenNames[currentScreen];
+      document.getElementById('screenLabelNum').textContent = (currentScreen + 1) + ' / ' + TOTAL;
+      document.querySelectorAll('.screen-dot').forEach((d, i) => d.classList.toggle('active', i === currentScreen));
+      document.getElementById('prevBtn').disabled = currentScreen === 0;
+      document.getElementById('nextBtn').disabled = currentScreen === TOTAL - 1;
+    }
+
+    function goScreen(idx) {
+      if (idx === currentScreen) return;
+      screens[currentScreen].classList.add('exit');
+      setTimeout(() => screens[currentScreen].classList.remove('exit'), 350);
+      screens[currentScreen].classList.remove('active');
+      screens[idx].classList.add('active');
+      currentScreen = idx;
+      updateNav();
+      // Trigger animations on enter
+      if (idx === 3) animatePassengerRing();
+      if (idx === 4) animateDriverDashboard();
+    }
+
+    function prevScreen() { if (currentScreen > 0) goScreen(currentScreen - 1); }
+    function nextScreen() { if (currentScreen < TOTAL - 1) goScreen(currentScreen + 1); }
+
+    updateNav();
+
+    // ============== PASSENGER RING ==============
+    function animatePassengerRing() {
+      const ring = document.getElementById('ring-passenger');
+      const label = document.getElementById('pts-passenger');
+      const circumference = 408;
+      const target = 240;
+      const total = 500;
+      const offset = circumference - (target / total) * circumference;
+      // Animate circle
+      ring.style.strokeDashoffset = circumference;
+      setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+      // Count up number
+      let cur = 0;
+      const step = target / 60;
+      const timer = setInterval(() => {
+        cur = Math.min(cur + step, target);
+        label.textContent = Math.round(cur);
+        if (cur >= target) clearInterval(timer);
+      }, 20);
+    }
+
+    // ============== DRIVER DASHBOARD ==============
+    function animateDriverDashboard() {
+      // Ring
+      const ring = document.getElementById('ring-driver');
+      const label = document.getElementById('pts-driver');
+      const circ = 352;
+      const target = 480;
+      const offset = circ - (target / 500) * circ;
+      ring.style.strokeDashoffset = circ;
+      setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+      let cur = 0;
+      const t1 = setInterval(() => {
+        cur = Math.min(cur + 8, target);
+        label.textContent = Math.round(cur);
+        if (cur >= target) clearInterval(t1);
+      }, 20);
+      // Rides/month counter
+      const rm = document.getElementById('rides-month');
+      let r = 0;
+      const t2 = setInterval(() => {
+        r = Math.min(r + 1, 48);
+        rm.textContent = r;
+        if (r >= 48) clearInterval(t2);
+      }, 40);
+      // Completion %
+      const cp = document.getElementById('completion-pct');
+      let c = 0;
+      const t3 = setInterval(() => {
+        c = Math.min(c + 2, 98);
+        cp.textContent = c + '%';
+        if (c >= 98) clearInterval(t3);
+      }, 30);
+    }
+
+    // ============== SLIDER QUESTIONS ==============
+    const driverQuestions = [
+      "How important is filling your seats quickly and efficiently?",
+      "How important are in-app communication and live updates?",
+      "How important are tools for scheduling and organizing pickups?",
+      "How important is transparent pricing with no hidden fees?",
+      "How important is passenger punctuality and reliability?",
+      "How important is seeing verified student profiles before accepting?",
+      "How important is an intuitive, easy-to-navigate driver app?"
+    ];
+    const defaultVals = [3, 3, 3, 3, 3, 3, 3];
+
+    const sqEl = document.getElementById('slider-questions');
+    driverQuestions.forEach((q, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'slider-row';
+      wrap.innerHTML = `
+        <div class="slider-q">${i+1}) ${q}</div>
+        <div class="slider-track">
+          <input type="range" min="1" max="5" step="0.5" value="${defaultVals[i]}"
+            style="--val: ${((defaultVals[i]-1)/4)*100}%"
+            oninput="updateSlider(this)">
+        </div>
+        <div class="slider-labels">
+          <span>1 NOT IMPORTANT</span>
+          <span>2</span>
+          <span>3</span>
+          <span>4</span>
+          <span>5 IMPORTANT</span>
+        </div>
+      `;
+      sqEl.appendChild(wrap);
+    });
+
+    function updateSlider(el) {
+      const pct = ((el.value - 1) / 4) * 100;
+      el.style.setProperty('--val', pct + '%');
+    }
+
+    // ============== PREF ITEMS TOGGLE ==============
+    document.querySelectorAll('.pref-item').forEach(item => {
+      item.addEventListener('click', () => item.classList.toggle('selected'));
+    });
+
+    // ============== KEYBOARD NAVIGATION ==============
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' && currentScreen < screens.length - 1) {
+        goScreen(currentScreen + 1);
+      }
+      if (e.key === 'ArrowLeft' && currentScreen > 0) {
+        goScreen(currentScreen - 1);
+      }
+    });
+  </script>
+</body>
+</html>

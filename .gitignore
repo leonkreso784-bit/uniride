@@ -1,0 +1,19 @@
+# PowerPoint / Office files
+*.pptx
+*.docx
+*.pdf
+
+# Python scripts (build tools, not needed in deployment)
+*.py
+__pycache__/
+
+# Text analysis files
+*.txt
+
+# Loose images at root (not part of web app)
+image1.png
+image2.png
+
+# OS
+.DS_Store
+Thumbs.db
