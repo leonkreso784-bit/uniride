@@ -1159,7 +1159,7 @@
                   </div>
                 </div>
                 <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">10 points per ride. <strong style="color:var(--navy);">20 points</strong> until next reward!</div>
-                <button class="btn-primary" onclick="goScreen(8)">View Rewards</button>
+                <button class="btn-primary" onclick="goScreen(9)">View Rewards</button>
               </div>
 
               <!-- Gold tier badge -->
@@ -1220,7 +1220,7 @@
           <div class="bottom-nav">
             <div class="bnav-item"><span class="bnav-icon">📊</span>Dashboard</div>
             <div class="bnav-item"><span class="bnav-icon">📈</span>Activity</div>
-            <div class="bnav-item active" style="color:var(--sky);"><span class="bnav-icon">⭐</span>Rewards</div>
+            <div class="bnav-item" onclick="goScreen(9)" style="color:var(--sky);"><span class="bnav-icon">⭐</span>Rewards</div>
             <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
           </div>
         </div>
@@ -1982,6 +1982,111 @@
             <div class="bnav-item"><span class="bnav-icon">🚗</span>TRIPS</div>
             <div class="bnav-item"><span class="bnav-icon">⭐</span>REWARDS</div>
             <div class="bnav-item active" onclick="goScreen(14)"><span class="bnav-icon">👤</span>PROFILE</div>
+          </div>
+        </div>
+
+        <!-- ============================== -->
+        <!-- SCREEN 16: DRIVER REDEEM       -->
+        <!-- ============================== -->
+        <div class="screen" id="screen-16">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <div class="status-icons">
+              <svg width="16" height="11" fill="currentColor"><rect x="0" y="3" width="3" height="8" opacity=".3"/><rect x="4" y="2" width="3" height="9" opacity=".5"/><rect x="8" y="1" width="3" height="10" opacity=".7"/><rect x="12" y="0" width="4" height="11"/></svg>
+              <svg width="25" height="12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="4" width="3" height="4" rx="1"/><rect x="1.5" y="2.5" width="20" height="7" rx="1.2"/></svg>
+            </div>
+          </div>
+          <div class="app-header">
+            <span class="back-btn" onclick="goScreen(8)">←</span>
+            <span class="brand">Redeem Points</span>
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#0EA5E9,#2563EB);">J</div>
+          </div>
+          <div class="scroll-area">
+            <div class="s-content" style="padding-top:12px;">
+
+              <!-- Balance card -->
+              <div style="background:var(--navy);border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden;">
+                <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.05);"></div>
+                <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:36px;opacity:0.15;">⛽</div>
+                <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">YOUR BALANCE</div>
+                <div style="font-size:36px;font-weight:900;color:white;line-height:1.1;"><span>480</span> <span style="font-size:22px;font-weight:700;">Points</span></div>
+                <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,0.25);border-radius:20px;padding:4px 12px;margin-top:10px;">
+                  <span style="font-size:13px;">🔰</span>
+                  <span style="font-size:12px;font-weight:800;color:#FCD34D;">Gold Tier Partner</span>
+                </div>
+              </div>
+
+              <!-- Fuel Vouchers section -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:15px;font-weight:800;color:var(--navy);">Fuel Vouchers</div>
+                <span style="font-size:18px;">⛽</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+                <!-- Migrol -->
+                <div style="background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;">
+                  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);height:72px;display:flex;align-items:center;justify-content:center;font-size:28px;">🛢️</div>
+                  <div style="padding:10px;">
+                    <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:2px;">Migrol</div>
+                    <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">CHF 20 Voucher</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);">🪙 <strong style="color:var(--navy);">200 pts</strong></div>
+                      <span style="font-size:12px;color:var(--sky);font-weight:700;">›</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Coop Pronto -->
+                <div style="background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden;">
+                  <div style="background:linear-gradient(135deg,#e65100,#bf360c);height:72px;display:flex;align-items:center;justify-content:center;font-size:28px;">🏪</div>
+                  <div style="padding:10px;">
+                    <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:2px;">Coop Pronto</div>
+                    <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:8px;">CHF 50 Voucher</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);">🪙 <strong style="color:var(--navy);">450 pts</strong></div>
+                      <span style="font-size:12px;color:var(--sky);font-weight:700;">›</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cash Back section -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:15px;font-weight:800;color:var(--navy);">Cash Back</div>
+                <span style="background:#DCFCE7;color:#16A34A;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">Ideal for EV</span>
+              </div>
+
+              <!-- CHF 10 -->
+              <div style="background:white;border-radius:14px;border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:12px;background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💳</div>
+                <div style="flex:1;">
+                  <div style="font-size:14px;font-weight:800;color:var(--navy);">CHF 10 Cash to Account</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:2px;">Direct bank transfer</div>
+                </div>
+                <button style="background:var(--navy);color:white;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;">100 pts</button>
+              </div>
+
+              <!-- CHF 25 -->
+              <div style="background:white;border-radius:14px;border:1px solid var(--border);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:12px;background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💳</div>
+                <div style="flex:1;">
+                  <div style="font-size:14px;font-weight:800;color:var(--navy);">CHF 25 Cash to Account</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:2px;">Direct bank transfer</div>
+                </div>
+                <button style="background:var(--navy);color:white;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;flex-shrink:0;">240 pts</button>
+              </div>
+
+              <!-- Info note -->
+              <div style="border-left:3px solid var(--border);padding:10px 14px;background:white;border-radius:0 12px 12px 0;margin-bottom:80px;display:flex;align-items:flex-start;gap:8px;">
+                <span style="font-size:14px;flex-shrink:0;">ℹ️</span>
+                <span style="font-size:12px;color:var(--muted);line-height:1.5;">Vouchers valid at participating Swiss gas stations.</span>
+              </div>
+
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="bnav-item" onclick="goScreen(8)"><span class="bnav-icon">📊</span>Dashboard</div>
+            <div class="bnav-item"><span class="bnav-icon">📈</span>Activity</div>
+            <div class="bnav-item active" style="color:var(--sky);"><span class="bnav-icon">🎁</span>Redeem</div>
+            <div class="bnav-item"><span class="bnav-icon">👤</span>Profile</div>
           </div>
         </div>
 
