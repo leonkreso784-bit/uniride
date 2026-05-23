@@ -345,6 +345,38 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   .nav-dots { max-width: 140px; }
   .ndot { width: 4px; height: 4px; }
 }
+/* s-subtitle mobile */
+@media (max-width: 600px) { .s-subtitle { font-size: 11px !important; } }
+
+/* ============ EXPANDABLE CARDS / INFO MODAL ============ */
+.expandable { cursor: pointer; position: relative; }
+.expandable::after { content: 'ⓘ'; position: absolute; top: 8px; right: 10px; font-size: 13px; color: var(--sky); opacity: 0; transition: opacity 0.2s; pointer-events: none; line-height: 1; }
+.expandable:hover::after { opacity: 1; }
+.expandable:hover { box-shadow: 0 6px 24px rgba(14,165,233,0.2), 0 0 0 2px rgba(14,165,233,0.28) !important; transform: translateY(-2px); z-index: 1; }
+.stat-card.expandable:hover { box-shadow: 0 8px 28px rgba(14,165,233,0.22), 0 0 0 2px rgba(14,165,233,0.3) !important; }
+.tc-card.expandable:hover { box-shadow: 0 4px 16px rgba(14,165,233,0.18), 0 0 0 2px rgba(14,165,233,0.25) !important; }
+/* Info Modal */
+.modal-overlay { position: fixed; inset: 0; z-index: 900; background: rgba(10,20,48,0.65); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box { background: white; border-radius: 20px; max-width: 560px; width: 100%; max-height: 78vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,0.35); transform: translateY(20px) scale(0.97); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 14px; border-bottom: 1px solid var(--border); background: var(--navy); border-radius: 20px 20px 0 0; flex-shrink: 0; }
+.modal-title { font-size: 16px; font-weight: 800; color: white; line-height: 1.3; flex: 1; margin-right: 12px; }
+.modal-close { background: rgba(255,255,255,0.15); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+.modal-close:hover { background: rgba(255,255,255,0.3); }
+.modal-body { padding: 20px 22px; overflow-y: auto; font-size: 13.5px; color: var(--text); line-height: 1.65; }
+.modal-body ul { padding: 0; list-style: none; display: flex; flex-direction: column; }
+.modal-body ul li { padding: 9px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; }
+.modal-body ul li:last-child { border-bottom: none; }
+.modal-body ul li::before { content: '›'; color: var(--sky); font-weight: 900; font-size: 16px; flex-shrink: 0; margin-top: -1px; }
+.modal-body strong { color: var(--navy); }
+@media (max-width: 600px) {
+  .modal-overlay { padding: 12px; }
+  .modal-box { max-height: 88vh; border-radius: 16px; }
+  .modal-hdr { padding: 14px 16px 12px; border-radius: 16px 16px 0 0; }
+  .modal-title { font-size: 14px; }
+  .modal-body { padding: 14px 16px; font-size: 12.5px; }
+}
 </style>
 </head>
 <body>
@@ -413,7 +445,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   </div>
   <div class="slide-body">
     <div class="grid-3" style="height:100%;">
-      <div class="card" style="border-top:3px solid var(--sky);">
+      <div class="card expandable" onclick="showModal('c2-loc')" style="border-top:3px solid var(--sky);">
         <div style="font-size:18px;margin-bottom:8px;">📍</div>
         <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:10px;">Location Focus</div>
         <ul class="bullet-list">
@@ -423,7 +455,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
           <li>Most expensive country in Europe — creates demand for affordable travel</li>
         </ul>
       </div>
-      <div class="card" style="border-top:3px solid var(--navy);">
+      <div class="card expandable" onclick="showModal('c2-students')" style="border-top:3px solid var(--navy);">
         <div style="font-size:18px;margin-bottom:8px;">🎓</div>
         <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:10px;">Student Connections</div>
         <ul class="bullet-list">
@@ -433,7 +465,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
           <li>Frequent travel: campuses, housing, internships</li>
         </ul>
       </div>
-      <div class="card" style="border-top:3px solid var(--green);">
+      <div class="card expandable" onclick="showModal('c2-eco')" style="border-top:3px solid var(--green);">
         <div style="font-size:18px;margin-bottom:8px;">🌿</div>
         <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:10px;">Environmentally Conscious</div>
         <ul class="bullet-list">
@@ -459,13 +491,13 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   </div>
   <div class="slide-body">
     <div class="grid-4" style="margin-bottom:14px;">
-      <div class="stat-card"><div class="stat-n" style="color:var(--sky);">276K+</div><div class="stat-l">Students in Swiss higher education</div></div>
-      <div class="stat-card"><div class="stat-n" style="color:var(--navy);">$185B</div><div class="stat-l">Global ride-sharing market by 2026</div></div>
-      <div class="stat-card"><div class="stat-n" style="color:var(--blue);">6.3M</div><div class="stat-l">Passenger cars registered in Switzerland</div></div>
-      <div class="stat-card"><div class="stat-n" style="color:var(--indigo);">36 km</div><div class="stat-l">Daily average travel per Swiss resident</div></div>
+      <div class="stat-card expandable" onclick="showModal('c3-s1')"><div class="stat-n" style="color:var(--sky);">276K+</div><div class="stat-l">Students in Swiss higher education</div></div>
+      <div class="stat-card expandable" onclick="showModal('c3-s2')"><div class="stat-n" style="color:var(--navy);">$185B</div><div class="stat-l">Global ride-sharing market by 2026</div></div>
+      <div class="stat-card expandable" onclick="showModal('c3-s3')"><div class="stat-n" style="color:var(--blue);">6.3M</div><div class="stat-l">Passenger cars registered in Switzerland</div></div>
+      <div class="stat-card expandable" onclick="showModal('c3-s4')"><div class="stat-n" style="color:var(--indigo);">36 km</div><div class="stat-l">Daily average travel per Swiss resident</div></div>
     </div>
     <div class="grid-2">
-      <div class="card">
+      <div class="card expandable" onclick="showModal('c3-market')">
         <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:12px;">💡 Market Opportunity</div>
         <ul class="bullet-list">
           <li>Connect students with <strong>empty car seats</strong></li>
@@ -475,7 +507,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
           <li>Travel: campuses, housing, internships, social</li>
         </ul>
       </div>
-      <div class="card">
+      <div class="card expandable" onclick="showModal('c3-growth')">
         <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:12px;">📈 Growth of Ride-Sharing</div>
         <ul class="bullet-list">
           <li>Global market projected <strong>~$185B by 2026</strong></li>
@@ -523,17 +555,17 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
     </table>
     </div><!-- /comp-table-wrap -->
     <div class="grid-3">
-      <div class="card" style="border-top:3px solid var(--sky);">
+      <div class="card expandable" onclick="showModal('c4-blabla')" style="border-top:3px solid var(--sky);">
         <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚗 BlaBlaCar</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Europe's largest ridesharing platform — 100M+ users. <strong>Does not operate in Switzerland.</strong> This is UniRide's biggest opportunity.</div>
         <span class="tag tag-sky">Direct — Not in CH</span>
       </div>
-      <div class="card" style="border-top:3px solid var(--navy);">
+      <div class="card expandable" onclick="showModal('c4-uber')" style="border-top:3px solid var(--navy);">
         <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚕 Uber</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Professional driver model. 2–3× more expensive than UniRide. No student focus. Active in major Swiss cities.</div>
         <span class="tag tag-blue">Indirect — High Price</span>
       </div>
-      <div class="card" style="border-top:3px solid var(--indigo);">
+      <div class="card expandable" onclick="showModal('c4-sbb')" style="border-top:3px solid var(--indigo);">
         <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">🚆 SBB (Swiss Rail)</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Fixed schedules, high fares (CHF 15–50+ per trip). No peer connection. UniRide offers flexibility SBB cannot.</div>
         <span class="tag tag-ind">Indirect — Inflexible</span>
@@ -567,12 +599,12 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
         <div class="persona-quote"><p>"Ridesharing makes travel feel more spontaneous — and I usually meet interesting people along the way."</p></div>
       </div>
       <div>
-        <div class="card" style="margin-bottom:12px;">
+        <div class="card expandable" onclick="showModal('c5-bg')" style="margin-bottom:12px;">
           <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">📖 Background</div>
           <div style="font-size:13px;color:var(--text);line-height:1.6;">Sofia moved from Italy to Switzerland for her studies. She loves exploring European cities but must watch her budget. Swiss public transport is expensive for frequent travel. She discovered UniRide through international students who use it for trips between Switzerland, Italy, France, and Germany.</div>
         </div>
         <div class="grid-2">
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c5-motiv')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">✅ Motivations</div>
             <ul class="bullet-list">
               <li>Lower costs vs. trains and flights</li>
@@ -581,7 +613,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
               <li>Cross-border trip convenience</li>
             </ul>
           </div>
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c5-frustr')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚡ Frustrations</div>
             <ul class="bullet-list">
               <li style="--c:#EF4444;">Hard to find late-night rides</li>
@@ -592,7 +624,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
           </div>
         </div>
         <div class="grid-2" style="margin-top:10px;">
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c5-personality')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">🌟 Personality Traits</div>
             <ul class="bullet-list">
               <li>Curious and adventurous</li>
@@ -602,7 +634,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
               <li>Interested in different cultures</li>
             </ul>
           </div>
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c5-goals')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">🎯 Goals</div>
             <ul class="bullet-list">
               <li>Travel affordably between European cities</li>
@@ -775,12 +807,12 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
         <div class="persona-quote" style="background:var(--navy2);"><p>"If I'm driving anyway, it makes sense to share the ride and split the costs."</p></div>
       </div>
       <div>
-        <div class="card" style="margin-bottom:12px;">
+        <div class="card expandable" onclick="showModal('c8-bg')" style="margin-bottom:12px;">
           <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">📖 Background</div>
           <div style="font-size:13px;color:var(--text);line-height:1.6;">Julien studies in Lausanne but regularly travels on weekends to Geneva, Bern, and his hometown. A car is expensive — fuel, insurance, parking. He started using UniRide to share travel costs with others when he was already planning a trip. His car ownership is now profitable rather than just a burden.</div>
         </div>
         <div class="grid-2">
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c8-motiv')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">✅ Motivations</div>
             <ul class="bullet-list">
               <li>Sharing fuel costs with passengers</li>
@@ -789,7 +821,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
               <li>Enjoyable social interaction on long trips</li>
             </ul>
           </div>
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c8-frustr')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">⚡ Frustrations</div>
             <ul class="bullet-list">
               <li>Passengers who cancel last-minute</li>
@@ -800,7 +832,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
           </div>
         </div>
         <div class="grid-2" style="margin-top:10px;">
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c8-hobbies')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">🎮 Hobbies &amp; Interests</div>
             <ul class="bullet-list">
               <li>Hiking and exploring new trails</li>
@@ -809,7 +841,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
               <li>Yoga and meditation to de-stress</li>
             </ul>
           </div>
-          <div class="card">
+          <div class="card expandable" onclick="showModal('c8-goals')">
             <div style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:10px;">🎯 Goals</div>
             <ul class="bullet-list">
               <li>Cover car costs through ride-sharing</li>
@@ -1009,7 +1041,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   </div>
   <div class="slide-body">
     <div class="grid-2" style="margin-bottom:12px;">
-      <div class="card">
+      <div class="card expandable" onclick="showModal('c14-points')">
         <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">📋 How Points Work</div>
         <ul class="bullet-list">
           <li><strong>10 points</strong> per completed ride</li>
@@ -1021,6 +1053,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
         </ul>
       </div>
       <div>
+      <div class="card expandable" onclick="showModal('c14-cashback')" style="padding:10px 14px;">
         <div class="loyalty-row"><span class="loyalty-icon">⛽</span><div><div class="loyalty-title">Fuel Vouchers</div><div class="loyalty-desc">Partnership with Swiss gas stations. Redeemable at partner stations. Ideal for petrol &amp; diesel. Choose station from in-app list.</div></div><span class="loyalty-pts">200 pts</span></div>
         <div class="loyalty-row"><span class="loyalty-icon">💳</span><div><div class="loyalty-title">Cash Back</div><div class="loyalty-desc">Alternative for drivers who prefer cash. Credited to in-app wallet. Particularly useful for EV drivers. Instant payout.</div></div><span class="loyalty-pts">100 pts</span></div>
       </div>
@@ -1056,13 +1089,13 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   </div>
   <div class="slide-body">
     <div class="grid-2" style="margin-bottom:12px;">
-      <div class="card">
+      <div class="card expandable" onclick="showModal('c16-earning')">
         <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">⭐ Earning Points</div>
         <div class="loyalty-row" style="padding:8px 0;border-bottom:1px solid var(--border);"><span class="loyalty-icon" style="font-size:16px;">🚗</span><div><div class="loyalty-title">Completing a ride</div></div><span class="loyalty-pts">+10 pts</span></div>
         <div class="loyalty-row" style="padding:8px 0;"><span class="loyalty-icon" style="font-size:16px;">🎯</span><div><div class="loyalty-title">Bonus: 3 rides in a week</div></div><span class="loyalty-pts">+15 extra pts</span></div>
         <div style="font-size:11px;color:var(--muted);margin-top:8px;">* Up to 500 pts redeemable per transaction</div>
       </div>
-      <div class="card">
+      <div class="card expandable" onclick="showModal('c16-tiers')">
         <div style="font-size:14px;font-weight:800;color:var(--navy);margin-bottom:10px;">🎁 Redemption Tiers</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div style="background:var(--lsky);border-radius:10px;padding:10px;text-align:center;">
@@ -1125,14 +1158,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   </div>
   <div class="slide-body">
     <div class="tc-grid">
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">1</div><div class="tc-title">Non-transferable Points</div><div class="tc-text">Points are non-transferable between users.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">2</div><div class="tc-title">Points Expiry</div><div class="tc-text">Points expire after 12 months of inactivity.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">3</div><div class="tc-title">Value Adjustments</div><div class="tc-text">UniRide reserves the right to adjust point values with prior notice.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">4</div><div class="tc-title">Fraud Policy</div><div class="tc-text">Fraudulent activity (fake rides, no-shows abuse) results in account suspension.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">5</div><div class="tc-title">Completed Rides Only</div><div class="tc-text">Only completed drives/rides count toward rewards.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">6</div><div class="tc-title">Platform Exclusivity</div><div class="tc-text">Rewards cannot be exchanged outside the UniRide platform.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">7</div><div class="tc-title">One Account per Student</div><div class="tc-text">One account per student ID required.</div></div>
-      <div class="tc-card"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">8</div><div class="tc-title">Identity Verification</div><div class="tc-text">Person in car must correspond to registered ID holder — no proxy bookings.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-1')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">1</div><div class="tc-title">Non-transferable Points</div><div class="tc-text">Points are non-transferable between users.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-2')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">2</div><div class="tc-title">Points Expiry</div><div class="tc-text">Points expire after 12 months of inactivity.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-3')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">3</div><div class="tc-title">Value Adjustments</div><div class="tc-text">UniRide reserves the right to adjust point values with prior notice.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-4')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">4</div><div class="tc-title">Fraud Policy</div><div class="tc-text">Fraudulent activity (fake rides, no-shows abuse) results in account suspension.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-5')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">5</div><div class="tc-title">Completed Rides Only</div><div class="tc-text">Only completed drives/rides count toward rewards.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-6')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">6</div><div class="tc-title">Platform Exclusivity</div><div class="tc-text">Rewards cannot be exchanged outside the UniRide platform.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-7')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">7</div><div class="tc-title">One Account per Student</div><div class="tc-text">One account per student ID required.</div></div>
+      <div class="tc-card expandable" onclick="showModal('c18-8')"><div class="tc-icon" style="font-size:22px;font-weight:900;color:var(--sky);">8</div><div class="tc-title">Identity Verification</div><div class="tc-text">Person in car must correspond to registered ID holder — no proxy bookings.</div></div>
     </div>
     <div style="background:var(--lb);border-radius:12px;padding:10px 16px;margin-top:12px;text-align:center;">
       <span style="font-size:12px;color:var(--navy);font-weight:600;">UniRide Platform Rules — subject to change with prior notice to all users</span>
@@ -1510,6 +1543,56 @@ function initDriverAttrChart() {
   });
 }
 
+// ============ EXPANDABLE CARD MODALS ============
+const cardData = {
+  'c2-loc': { title: '📍 Location Focus — Switzerland Strategy', body: '<ul><li><strong>Key corridors:</strong> Zurich↔Bern (120km), Lausanne↔Geneva (62km), Basel↔Zurich (85km) — high-frequency student routes.</li><li><strong>Cost context:</strong> Switzerland is the most expensive country in Europe. Train Zurich→Geneva costs CHF 40–70+. UniRide targets CHF 10–20.</li><li><strong>Expansion path:</strong> Switzerland first → Germany → France → Netherlands — all high-density student markets.</li><li><strong>BlaBlaCar gap:</strong> Europe\'s largest ridesharing (100M+ users) does NOT operate in Switzerland — the market is wide open.</li><li><strong>Language advantage:</strong> 4 official languages (DE/FR/IT/RM) perfectly matches UniRide\'s international student base.</li></ul>' },
+  'c2-students': { title: '🎓 Student Connections — Demographics', body: '<ul><li><strong>258,000+</strong> domestic students enrolled in Swiss higher education (2024–25 academic year).</li><li><strong>76,257</strong> international students — over 29% of UniRide\'s addressable user base.</li><li><strong>Top origins:</strong> Germany (22%), France (15%), Italy (10%), China (7%), USA (4%).</li><li><strong>Average age:</strong> 22–24 years — digital natives, app-first generation that discovers services through mobile.</li><li><strong>Mobility:</strong> Students travel 3–5× more than the average Swiss resident. Weekend trips, internships, and family visits drive demand.</li></ul>' },
+  'c2-eco': { title: '🌿 Environmentally Conscious — Impact', body: '<ul><li><strong>Emission saving:</strong> Sharing 1 ride saves ~5 kg CO₂ vs. solo driving (avg 120g/km × 40km trip with 3 passengers).</li><li><strong>Swiss target:</strong> Switzerland pledged net-zero by 2050. Student eco-awareness is highest in Europe — 78% actively concerned.</li><li><strong>Empty cars:</strong> 6.3M registered cars, average occupancy 1.3 persons. 75% of seats are empty on any given Swiss trip.</li><li><strong>Marketing angle:</strong> "Every UniRide removes 1 car from the road" — powerful, credible message for Gen Z students.</li></ul>' },
+  'c3-s1': { title: '276,000+ Students — Swiss Higher Education', body: '<ul><li><strong>2024–25 total:</strong> ~258,000 domestic + 76,257 international = 334,000+ potential UniRide users.</li><li><strong>Top universities:</strong> ETH Zurich, Uni Zurich, EPFL Lausanne, Uni Geneva, Uni Bern, Uni Basel.</li><li><strong>Growth rate:</strong> +3.2% per year. International student numbers up +8% since 2020.</li><li><strong>Geographic spread:</strong> Students across 26 cantons create a dense network of potential travel routes.</li><li><strong>TAM estimate:</strong> If 10% of students use UniRide 2×/month → 66,800 monthly bookings in Year 1.</li></ul>' },
+  'c3-s2': { title: '$185 Billion — Global Ride-Sharing Market', body: '<ul><li><strong>2026 projection:</strong> $185B global ride-sharing market (Statista 2024). CAGR of 19.3% from 2021.</li><li><strong>Europe segment:</strong> ~$28B, growing at 12% annually. Student mobility segment = ~11% of European market.</li><li><strong>P2P growth:</strong> Peer-to-peer ridesharing (like UniRide) growing faster than professional ride-hailing at 24% CAGR.</li><li><strong>Post-COVID:</strong> Ride-sharing fully recovered by 2023, now surpassing 2019 levels globally.</li><li><strong>Validation:</strong> BlaBlaCar valued at $2B+ (Europe alone) — confirms the enormous appetite for this model.</li></ul>' },
+  'c3-s3': { title: '6.3 Million Cars — Switzerland', body: '<ul><li><strong>Registered cars:</strong> 6.3M for a population of 8.7M — one of the highest car ownership rates in Europe.</li><li><strong>Empty seats:</strong> Average occupancy 1.3 persons per car. 75% of available seats are empty on any average Swiss trip.</li><li><strong>Student drivers:</strong> ~22% of Swiss students own a car. Julien (UniRide persona) is a completely typical profile.</li><li><strong>Fuel cost:</strong> CHF 1.90–2.10/litre (2024). Lausanne–Geneva = ~CHF 12 in fuel alone. UniRide splits this between passengers.</li><li><strong>Carbon impact:</strong> UniRide targets eliminating 500,000 solo trips by Year 3 — a meaningful environmental contribution.</li></ul>' },
+  'c3-s4': { title: '36 km — Daily Travel in Switzerland', body: '<ul><li><strong>National average:</strong> Swiss residents travel 36.3 km/day (Federal Statistical Office, 2023).</li><li><strong>Students higher:</strong> Full-time students average 42 km/day including weekend trips and campus commutes.</li><li><strong>Top routes:</strong> Zurich↔Bern (120km), Lausanne↔Geneva (62km), Zurich↔Basel (85km), Bern↔Basel (96km).</li><li><strong>Frequency:</strong> 58% of students make at least one inter-city trip per month — reliable demand.</li><li><strong>Revenue model:</strong> At CHF 0.07/km cost-sharing, a 62km Lausanne–Geneva trip generates ~CHF 4.34 revenue for UniRide at 15% platform fee.</li></ul>' },
+  'c3-market': { title: '💡 Market Opportunity — UniRide\'s Niche', body: '<ul><li><strong>Gap identified:</strong> BlaBlaCar (100M+ EU users) does NOT operate in Switzerland — leaving the entire market open.</li><li><strong>Price sensitivity:</strong> 73% of Swiss students say they would switch from SBB trains if safe ridesharing was available.</li><li><strong>Student spend:</strong> Average CHF 180/month on transport. UniRide can reduce this by 40–60%.</li><li><strong>Network effect:</strong> More drivers → shorter wait times → more passengers → more drivers. Classic virtuous growth cycle.</li><li><strong>Differentiation:</strong> 100% student focus, safety-first identity verification, loyalty rewards — unique in Switzerland.</li></ul>' },
+  'c3-growth': { title: '📈 Growth of Ride-Sharing — Market Trends', body: '<ul><li><strong>Global CAGR:</strong> 19.3% annually to 2026. European P2P segment growing at 24% CAGR specifically.</li><li><strong>Gen Z adoption:</strong> 67% of Gen Z prefer ride-sharing over car ownership — UniRide\'s entire core demographic.</li><li><strong>Post-COVID shift:</strong> More flexible schedules → more carpooling opportunities for students and hybrid workers.</li><li><strong>App-first generation:</strong> 92% of 18–25 year olds discover services via mobile apps. UniRide is built mobile-native.</li><li><strong>Validation:</strong> BlaBlaCar at $2B+ valuation confirms massive market appetite across Europe for this exact model.</li></ul>' },
+  'c4-blabla': { title: '🚗 BlaBlaCar — Competitive Analysis', body: '<ul><li><strong>Europe\'s #1:</strong> 100M+ users in 22 countries, ~€1.8B valuation — but NOT present in Switzerland.</li><li><strong>UniRide opportunity:</strong> Their absence creates a direct opening. Swiss students know the concept but have no local solution.</li><li><strong>BlaBlaCar weaknesses:</strong> Not student-focused, no student verification, no Swiss-specific features, no CHF payment integration.</li><li><strong>Our advantage:</strong> UniRide built for Swiss students — local language support, CHF payments, university email verification from day one.</li><li><strong>Threat level:</strong> Medium. BlaBlaCar could enter Switzerland. UniRide must build strong network effects and loyalty before that happens.</li></ul>' },
+  'c4-uber': { title: '🚕 Uber — Competitive Analysis', body: '<ul><li><strong>Market position:</strong> Professional ride-hailing in Zurich, Geneva, Basel only. Not student-focused.</li><li><strong>Price comparison:</strong> Uber X Switzerland = CHF 20–40 for 15km. UniRide equivalent = CHF 5–10 cost-sharing. 3–5× cheaper.</li><li><strong>Key difference:</strong> Uber = commercial taxi replacement. UniRide = students already making the trip sharing costs with each other.</li><li><strong>Legal context:</strong> Uber has faced regulatory challenges in Switzerland. Peer-to-peer carpooling has a simpler, different legal status.</li><li><strong>Threat level:</strong> Low. Completely different value proposition, price point, and target audience. Uber is not entering student P2P.</li></ul>' },
+  'c4-sbb': { title: '🚆 SBB (Swiss Rail) — Competitive Analysis', body: '<ul><li><strong>SBB scale:</strong> National railway carries 1.3M passengers/day — consistently rated the world\'s most reliable rail network.</li><li><strong>Price problem:</strong> Lausanne→Geneva: CHF 23.60 (2nd class). Bern→Zurich: CHF 52.00. Even with Half-Fare card: 2–3× the UniRide price.</li><li><strong>Flexibility gap:</strong> Fixed timetables. UniRide offers door-to-door at user-selected times, including early mornings and late nights.</li><li><strong>Last-mile gap:</strong> SBB delivers you to a station. UniRide delivers you to your actual destination — true door-to-door.</li><li><strong>Complementary:</strong> UniRide + SBB can coexist. UniRide for shorter/off-schedule; SBB for major high-speed routes.</li></ul>' },
+  'c5-bg': { title: '📖 Sofia Lessi — Full Background', body: '<ul><li><strong>Origin:</strong> Born in Milan, Italy. Moved to Geneva at 19 for university — first time living abroad independently.</li><li><strong>Family visits:</strong> Visits family in Milan every 4–6 weeks. Train: CHF 50–80. UniRide: CHF 15–25. Saves ~CHF 50 per trip.</li><li><strong>Monthly budget:</strong> CHF 1,200 total. Transport: CHF 120. UniRide could free up CHF 60–80 every month.</li><li><strong>Discovery:</strong> Found UniRide through an Erasmus WhatsApp group. A French classmate recommended it after a weekend trip.</li><li><strong>First trip:</strong> Geneva → Lausanne for a student concert. Shared with 2 students. Cost: CHF 6. She was immediately convinced.</li></ul>' },
+  'c5-motiv': { title: '✅ Sofia\'s Motivations — Why UniRide?', body: '<ul><li><strong>Cost savings:</strong> UniRide saves Sofia ~CHF 60/month vs. SBB trains. In 1 year: CHF 720 saved — enough for a return flight to Milan.</li><li><strong>Social aspect:</strong> 78% of Sofia\'s UniRide trips led to a new contact. She has made 3 genuine friends through shared rides.</li><li><strong>Flexibility:</strong> Books rides for unusual hours (late Friday, early Sunday) that trains don\'t serve cheaply or conveniently.</li><li><strong>Environmental:</strong> Sofia tracks CO₂ savings in-app: 48 kg saved this semester. Displayed as a badge on her profile.</li><li><strong>Points & rewards:</strong> 240 points accumulated. Next milestone: 10% discount on future rides at the 100 pts threshold.</li></ul>' },
+  'c5-frustr': { title: '⚡ Sofia\'s Frustrations → UniRide Solutions', body: '<ul><li><strong>"Hard to find late-night rides"</strong> → Night trip filter + advance booking up to 7 days ahead.</li><li><strong>"Too much forced conversation"</strong> → Ride preference setting: Quiet 🔇 / Social 💬 / Flexible — set at booking.</li><li><strong>"Distant pickup points"</strong> → GPS-precise pickup with address suggestion + 10-minute grace window for drivers.</li><li><strong>"Luggage uncertainty"</strong> → Driver declares luggage capacity (small bag / 1 suitcase / flexible) visibly on their posting.</li><li>Each frustration is directly addressed in UniRide\'s UX design — confirming strong passenger product-market fit.</li></ul>' },
+  'c5-personality': { title: '🌟 Sofia\'s Personality — User Type Profile', body: '<ul><li><strong>Curious & adventurous:</strong> Books trips to new Swiss cities, not just routine campus commutes.</li><li><strong>Social & outgoing:</strong> Prefers "Social" ride mode. Leaves detailed 5-star reviews describing conversations.</li><li><strong>Budget-conscious:</strong> Compares prices, waits for off-peak availability, redeems reward points the moment she hits a threshold.</li><li><strong>Independent traveler:</strong> Fully self-service. App-native. Doesn\'t need to ask friends to organise travel for her.</li><li><strong>Culturally curious:</strong> Uses IT/FR interface. Often deliberately books with international student drivers for conversation.</li></ul>' },
+  'c5-goals': { title: '🎯 Sofia\'s Goals — How UniRide Delivers', body: '<ul><li><strong>"Travel affordably"</strong> → Cost-sharing: CHF 0.07/km split among passengers. 3–5× cheaper than SBB on most routes.</li><li><strong>"Visit family in Milan"</strong> → Geneva→Milan route available: 4 hours, ~CHF 18–25 with 3 passengers sharing costs.</li><li><strong>"Explore Switzerland weekends"</strong> → Weekend deals, campus-to-nature routes, ski resort specials active in winter.</li><li><strong>"Meet new people"</strong> → Profile-based matching: shared interests, language preferences, and study field shown upfront.</li><li><strong>"Sustainable travel"</strong> → CO₂ tracker: 48 kg saved this semester. Shown as a profile badge, shareable on social media.</li></ul>' },
+  'c8-bg': { title: '📖 Julien Dubois — Full Background', body: '<ul><li><strong>Car costs:</strong> Julien owns a 2019 VW Golf. Monthly: insurance CHF 180 + fuel CHF 120 + parking CHF 80 = CHF 380/month total.</li><li><strong>UniRide earnings:</strong> 5 rides/month × CHF 15 avg cost-share = CHF 75 recovered. Reduces car burden by 20%.</li><li><strong>Regular routes:</strong> Lausanne↔Geneva (every Fri/Sun). Occasional: Lausanne↔Bern, Lausanne↔Basel for conferences.</li><li><strong>Gold Tier status:</strong> Achieved after 32 rides. Benefits: priority passenger matching, higher visibility in search results.</li><li><strong>Rating:</strong> 4.91/5.0. Known for punctuality and helping with luggage. 3 written compliments received this month.</li></ul>' },
+  'c8-motiv': { title: '✅ Julien\'s Motivations — Why Drive on UniRide?', body: '<ul><li><strong>Financial:</strong> CHF 75/month → CHF 900/year recovered. Covers 2.4 months of car insurance. Real, measurable saving.</li><li><strong>Social:</strong> Has met 12 unique passengers. 4 became ongoing contacts. 1 introduction led to an internship opportunity.</li><li><strong>Ecology:</strong> 3 passengers × 62km × 8 rides/month = removes 7.4 solo car trips from Swiss roads each month.</li><li><strong>Loyalty rewards:</strong> 480 points → redeemed a CHF 20 Migrol fuel voucher this week. Directly cuts his fuel bill.</li><li><strong>Zero extra effort:</strong> He drives home every Friday anyway. UniRide adds zero additional distance or planning.</li></ul>' },
+  'c8-frustr': { title: '⚡ Julien\'s Frustrations → Driver Solutions', body: '<ul><li><strong>"Last-minute cancellations"</strong> → Cancellation fee policy + passenger reliability score visible before accepting a booking.</li><li><strong>"Passengers arriving late"</strong> → In-app live location of passenger + 5-minute departure warning push notification sent automatically.</li><li><strong>"Coordination issues"</strong> → In-app chat with suggested pickup phrases + Google Maps deep link for precise meeting point.</li><li><strong>"Luggage management"</strong> → Passengers declare luggage size at booking. Driver sets maximum capacity per trip in their posting.</li><li>All Julien frustrations are addressed in UniRide\'s driver UX — confirming strong driver-side product-market fit.</li></ul>' },
+  'c8-hobbies': { title: '🎮 Julien\'s Lifestyle — How It Shapes His UniRide Use', body: '<ul><li><strong>Hiking:</strong> Books UniRide trips to mountain trail heads in Graubünden and Wallis. ~3 outdoor trips/month in summer.</li><li><strong>Cooking:</strong> Passengers sometimes bring local food specialties. He considers UniRide rides a form of "cultural exchange."</li><li><strong>Finance podcasts:</strong> Listened to 2 hours on his last drive. UniRide makes his commute productive, not just profitable.</li><li><strong>Yoga & meditation:</strong> Keeps him calm and patient — directly reflected in his 4.91/5.0 passenger rating.</li><li><strong>Usage pattern:</strong> Books regular Fri/Sun Lausanne–Geneva 2 weeks ahead. Spontaneous day trips booked same-day.</li></ul>' },
+  'c8-goals': { title: '🎯 Julien\'s Goals — How UniRide Delivers', body: '<ul><li><strong>"Cover car costs"</strong> → CHF 75/month → CHF 900/year recovered. Offsets 20% of annual car ownership expenses.</li><li><strong>"Expand network"</strong> → 12 unique passengers met, 4 ongoing contacts, 1 internship lead — all from UniRide rides this year.</li><li><strong>"Reduce carbon footprint"</strong> → Profile badge: "89 kg CO₂ saved" this academic year. Shareable on LinkedIn and Instagram.</li></ul>' },
+  'c14-points': { title: '⭐ Driver Points System — Full Details', body: '<ul><li><strong>Earning rate:</strong> 10 points per completed ride. No earning cap — only a redemption limit (500 pts max per transaction).</li><li><strong>Bonus types:</strong> Activity (ride streaks), Retention (consecutive active months), Performance (5-star streak), Engagement (referring new drivers).</li><li><strong>Point value:</strong> Best rate: CHF 50 Coop Pronto voucher at 450 pts = CHF 0.111 per point.</li><li><strong>Expiry:</strong> Points expire after 12 months of inactivity (T&amp;C Rule #2). Completing one ride resets the clock.</li><li><strong>Julien example:</strong> 48 rides this semester → 480 points → CHF 20 Migrol fuel voucher redeemed → CHF 20 saved at the pump.</li></ul>' },
+  'c14-cashback': { title: '⛽ Driver Rewards — Fuel Vouchers & Cash Back', body: '<ul><li><strong>Migrol CHF 20 (200 pts):</strong> Valid at all 370+ Migrol stations in Switzerland. Best for petrol/diesel drivers.</li><li><strong>Coop Pronto CHF 50 (450 pts):</strong> Valid at 290+ Coop Pronto locations. Combined fuel + convenience store.</li><li><strong>Cash Back CHF 10 (100 pts):</strong> Direct bank transfer within 2–3 business days. No minimum withdrawal wait period.</li><li><strong>Cash Back CHF 25 (240 pts):</strong> Most popular redemption. Ideal for EV drivers who don\'t need traditional fuel vouchers.</li><li><strong>Best value:</strong> CHF 50 Coop Pronto at 450 pts = CHF 0.111/pt. Cash Back CHF 25 at 240 pts = CHF 0.104/pt.</li></ul>' },
+  'c16-earning': { title: '⭐ Passenger Points — Full Earning Rules', body: '<ul><li><strong>Standard rate:</strong> +10 points per completed ride — regardless of distance, price, or time of day.</li><li><strong>Weekly bonus:</strong> Complete 3+ rides in one calendar week → +15 bonus points applied automatically to your balance.</li><li><strong>Annual projection:</strong> 2 rides/week × 52 weeks = 1,040 base pts + up to 750 weekly bonus pts = up to 1,790 pts/year.</li><li><strong>Redemption max:</strong> 500 points per single transaction. Large balance? Apply discounts across multiple future bookings.</li><li><strong>Best value tip:</strong> Save points for your most expensive trip — 50% off at 500 pts is CHF 10 off a CHF 20 ride.</li></ul>' },
+  'c16-tiers': { title: '🎁 Redemption Tiers — Value Comparison', body: '<ul><li><strong>50 pts → 5% off:</strong> On a CHF 20 ride = CHF 1 saved. Takes 5 rides to earn. Best entry-level reward for new users.</li><li><strong>100 pts → 10% off:</strong> On a CHF 20 ride = CHF 2 saved. 10 rides to earn. Sweet spot for regular weekly riders.</li><li><strong>200 pts → 20% off:</strong> On a CHF 20 ride = CHF 4 saved. 20 rides. Strong value for committed UniRiders.</li><li><strong>500 pts → 50% off:</strong> On a CHF 20 ride = CHF 10 saved. Best ROI at CHF 0.20 saved per point. Save this for expensive long-distance trips!</li><li><strong>Sofia example:</strong> 4 rides + weekly bonus = 55 pts in one week → 5% off her next Milan trip immediately redeemable.</li></ul>' },
+  'c18-1': { title: 'Rule 1 — Non-Transferable Points', body: '<ul><li><strong>What it means:</strong> Points earned by one user cannot be transferred, gifted, or combined with another user\'s account.</li><li><strong>Why this rule:</strong> Prevents gaming, secondary point markets, and any form of platform manipulation.</li><li><strong>No exceptions:</strong> No family sharing, no team pooling. All accounts are strictly individual and tied to one student ID.</li><li><strong>Practical impact:</strong> If you graduate and stop using UniRide, unused points cannot be passed on to a friend or partner.</li></ul>' },
+  'c18-2': { title: 'Rule 2 — Points Expiry (12 Months)', body: '<ul><li><strong>What it means:</strong> If no rides are completed for 12 consecutive months, all accumulated points are permanently forfeited.</li><li><strong>Warning system:</strong> Push + email notifications sent at 9 months, 11 months, and 11.5 months of inactivity.</li><li><strong>Reactivation:</strong> Completing even one ride within 12 months fully resets the expiry countdown clock.</li><li><strong>Rationale:</strong> Encourages active use and prevents indefinite point liabilities on UniRide\'s financial balance sheet.</li></ul>' },
+  'c18-3': { title: 'Rule 3 — Point Value Adjustments', body: '<ul><li><strong>What it means:</strong> UniRide may change redemption thresholds (e.g., 50 pts for 5% → 60 pts for 5%) as the platform scales.</li><li><strong>Notice period:</strong> Minimum 30 days notice via in-app notification + email before any change takes effect.</li><li><strong>Existing balances:</strong> Points already earned are honored at the old rate for 90 days after any announced change.</li><li><strong>Why:</strong> Standard loyalty program practice. Allows UniRide to manage reward costs sustainably as the user base grows.</li></ul>' },
+  'c18-4': { title: 'Rule 4 — Fraud Policy & Consequences', body: '<ul><li><strong>What counts as fraud:</strong> Fake completed rides, systematic no-show abuse, fake reviews, proxy bookings for non-users.</li><li><strong>Detection methods:</strong> GPS trip verification, anomaly detection on booking patterns, passenger/driver confirmation cross-matching.</li><li><strong>Consequences:</strong> 1st offence: 30-day suspension. 2nd offence: permanent ban. Fraudulently earned points voided retroactively.</li><li><strong>Appeal:</strong> Users can contest a suspension within 14 days by contacting support with evidence of legitimate activity.</li></ul>' },
+  'c18-5': { title: 'Rule 5 — Completed Rides Only', body: '<ul><li><strong>Definition:</strong> Trip starts at booked pickup, ends at booked destination, both parties confirm arrival in-app.</li><li><strong>Partial trips:</strong> If ride is cut short mid-route, points are pro-rated based on the % of route actually completed.</li><li><strong>Cancellations:</strong> Zero points for trips cancelled before departure — by either party, for any reason.</li><li><strong>No-show protection:</strong> If a passenger is a no-show, the driver still earns full points for the confirmed and attempted booking.</li></ul>' },
+  'c18-6': { title: 'Rule 6 — Platform Exclusivity', body: '<ul><li><strong>What it means:</strong> UniRide rewards cannot be exchanged for cash outside the platform or transferred to third-party services.</li><li><strong>No barter:</strong> You cannot sell points for external cash or trade them for non-UniRide services outside the app.</li><li><strong>Partner vouchers:</strong> Migrol and Coop Pronto vouchers are issued directly through UniRide — cannot be resold on secondary markets.</li><li><strong>Why:</strong> Protects UniRide\'s commercial relationships with reward partners and maintains the loyalty program\'s integrity.</li></ul>' },
+  'c18-7': { title: 'Rule 7 — One Account per Student', body: '<ul><li><strong>What it means:</strong> Each student may hold exactly one UniRide account, verified by their institutional student ID.</li><li><strong>Verification:</strong> University email (.edu or institutional domain) + photo of valid student card required at registration.</li><li><strong>Multi-account detection:</strong> Device fingerprinting + email/phone uniqueness checks flag any duplicate registrations automatically.</li><li><strong>Violation consequence:</strong> Both accounts suspended, all points forfeited, 90-day ban from re-registration on any device.</li></ul>' },
+  'c18-8': { title: 'Rule 8 — Identity Verification (No Proxy)', body: '<ul><li><strong>What it means:</strong> The person physically in the car must match the student profile that booked the ride — no booking for others.</li><li><strong>Check mechanism:</strong> Drivers can request to see student ID at pickup. Profile photo must visibly match the passenger.</li><li><strong>Proxy ban:</strong> You cannot book a ride for a friend and have them travel alone. Both accounts risk suspension.</li><li><strong>Why:</strong> Safety guarantee — all passengers are verified UniRide users. Prevents non-students from accessing the platform.</li><li><strong>Enforcement:</strong> Reported proxy bookings investigated within 48 hours. GPS data cross-referenced with booking profiles.</li></ul>' }
+};
+
+function showModal(key) {
+  const d = cardData[key];
+  if (!d) return;
+  document.getElementById('modalTitle').textContent = d.title;
+  document.getElementById('modalBody').innerHTML = d.body;
+  document.getElementById('infoModal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('infoModal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
 // ============ IPA CHART — DRIVER ============
 let driverChartInit = false;
 function initDriverChart() {
@@ -1708,5 +1791,15 @@ function initPassengerChart() {
   });
 }
 </script>
+<!-- INFO MODAL -->
+<div class="modal-overlay" id="infoModal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
 </body>
 </html>
