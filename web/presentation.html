@@ -44,12 +44,13 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   background:var(--bg);
   display:flex;flex-direction:column;
   opacity:0;pointer-events:none;
-  transition:opacity 0.45s cubic-bezier(0.4,0,0.2,1),transform 0.45s cubic-bezier(0.4,0,0.2,1);
-  transform:translateX(64px) scale(0.98);
+  transition:opacity 0.55s cubic-bezier(0.16,1,0.3,1),transform 0.55s cubic-bezier(0.16,1,0.3,1),filter 0.55s cubic-bezier(0.16,1,0.3,1);
+  transform:translateX(64px) scale(0.97);
+  filter:blur(4px);
   overflow:hidden;
 }
-.slide.active{opacity:1;pointer-events:all;transform:translateX(0) scale(1);}
-.slide.exit-left{opacity:0;transform:translateX(-64px) scale(0.98);}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0) scale(1);filter:blur(0);}
+.slide.exit-left{opacity:0;transform:translateX(-64px) scale(0.97);filter:blur(4px);}
 
 /* Subtle dot grid on all light slides */
 .slide:not(.dark-slide){
@@ -131,11 +132,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 
 /* ============ COMMON COMPONENTS ============ */
 .card{
-  background:white;border-radius:16px;padding:16px;
-  box-shadow:0 2px 12px rgba(30,58,95,0.07),0 0 0 1px rgba(30,58,95,0.04);
-  transition:box-shadow 0.2s;
+  background:rgba(255,255,255,0.78);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-radius:16px;padding:16px;
+  border:1px solid rgba(255,255,255,0.65);
+  box-shadow:0 4px 20px rgba(30,58,95,0.08),inset 0 1px 0 rgba(255,255,255,0.9);
+  transition:box-shadow 0.25s,transform 0.25s;
 }
-.card:hover{box-shadow:0 4px 20px rgba(30,58,95,0.12),0 0 0 1px rgba(14,165,233,0.1);}
+.card:hover{box-shadow:0 8px 32px rgba(30,58,95,0.14),0 0 0 1.5px rgba(14,165,233,0.25),inset 0 1px 0 rgba(255,255,255,1);transform:translateY(-1px);}
 .card-navy{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:16px;padding:16px;color:white;box-shadow:0 4px 16px rgba(30,58,95,0.25);}
 .tag{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:19px;font-weight:600;}
 .tag-sky{background:var(--lsky);color:var(--navy);}
@@ -147,11 +151,14 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 .stat-card{
-  background:white;border-radius:16px;padding:20px;text-align:center;
-  box-shadow:0 2px 12px rgba(30,58,95,0.07),0 0 0 1px rgba(30,58,95,0.04);
-  transition:transform 0.2s,box-shadow 0.2s;
+  background:rgba(255,255,255,0.78);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-radius:16px;padding:20px;text-align:center;
+  border:1px solid rgba(255,255,255,0.65);
+  box-shadow:0 4px 20px rgba(30,58,95,0.08),inset 0 1px 0 rgba(255,255,255,0.9);
+  transition:transform 0.25s,box-shadow 0.25s;
 }
-.stat-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(14,165,233,0.15);}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(14,165,233,0.2),inset 0 1px 0 white;}
 .stat-n{font-size:50px;font-weight:900;color:var(--navy);line-height:1;}
 .stat-l{font-size:19px;color:var(--muted);margin-top:4px;}
 .bullet-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
@@ -161,7 +168,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 .divider{height:1px;background:var(--border);margin:12px 0;}
 /* Journey */
 .j-grid{display:grid;gap:12px;}
-.j-phase{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.j-phase{background:rgba(255,255,255,0.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.6);border-radius:14px;overflow:hidden;box-shadow:0 4px 18px rgba(30,58,95,0.08);}
 .j-phase-hdr{padding:10px 16px;font-size:20px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:white;}
 .j-ph-awareness{background:var(--sky);}
 .j-ph-search{background:var(--navy);}
@@ -169,7 +176,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 .j-ph-purchase{background:#059669;}
 .j-ph-postpurchase{background:#7C3AED;}
 .j-channels{padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
-.j-ch{background:var(--bg);border-radius:10px;padding:10px 12px;}
+.j-ch{background:rgba(248,251,255,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:10px;padding:10px 12px;}
 .j-ch-name{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px;}
 .j-row{display:flex;gap:6px;font-size:17px;line-height:1.4;margin-bottom:3px;}
 .j-label{font-weight:700;color:var(--muted);min-width:38px;flex-shrink:0;}
@@ -206,7 +213,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 .comp-table th{background:var(--navy);color:white;padding:12px 16px;font-size:20px;font-weight:700;text-align:left;}
 .comp-table th:first-child{border-radius:12px 0 0 0;}
 .comp-table th:last-child{border-radius:0 12px 0 0;}
-.comp-table td{padding:11px 16px;font-size:20px;border-bottom:1px solid var(--border);background:white;}
+.comp-table td{padding:11px 16px;font-size:20px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.82);}
 .comp-table tr:hover td{background:var(--bg);}
 .comp-table td:first-child{font-weight:700;color:var(--navy);}
 .chk{color:#10B981;font-weight:700;font-size:24px;}
@@ -219,12 +226,12 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 .attr-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--sky),var(--blue));}
 /* T&C */
 .tc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.tc-card{background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.tc-card{background:rgba(255,255,255,0.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.65);border-radius:14px;padding:14px;box-shadow:0 4px 18px rgba(30,58,95,0.08),inset 0 1px 0 rgba(255,255,255,0.9);}
 .tc-card .tc-icon{font-size:37px;margin-bottom:8px;}
 .tc-card .tc-title{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px;}
 .tc-card .tc-text{font-size:19px;color:var(--muted);line-height:1.6;}
 /* Loyalty */
-.loyalty-row{display:flex;align-items:flex-start;gap:12px;padding:12px;background:white;border-radius:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.loyalty-row{display:flex;align-items:flex-start;gap:12px;padding:12px;background:rgba(255,255,255,0.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.65);border-radius:12px;margin-bottom:8px;box-shadow:0 2px 12px rgba(30,58,95,0.07),inset 0 1px 0 rgba(255,255,255,0.9);}
 .loyalty-icon{font-size:37px;flex-shrink:0;}
 .loyalty-title{font-size:22px;font-weight:700;color:var(--navy);}
 .loyalty-desc{font-size:19px;color:var(--muted);margin-top:2px;line-height:1.5;}
@@ -408,6 +415,20 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
   z-index: 10000;
 }
 #img-lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+/* ============ HERO ANIMATED GRADIENT ============ */
+@keyframes heroGrad {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes heroOrb {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%      { transform: translate(40px,-30px) scale(1.08); }
+  66%      { transform: translate(-30px,25px) scale(0.94); }
+}
+.hero-orb { animation: heroOrb 12s ease-in-out infinite; }
+.hero-orb2 { animation: heroOrb 16s ease-in-out infinite reverse; }
 </style>
 </head>
 <body>
@@ -436,8 +457,10 @@ html,body{height:100%;font-family:'Inter',sans-serif;overflow:hidden;background:
 <!-- ===================== SLIDE 1: TITLE ===================== -->
 <div class="slide dark-slide active" id="slide-1">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;position:relative;overflow:hidden;">
-    <!-- BG pattern -->
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(14,165,233,0.15),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(99,102,241,0.12),transparent 60%);pointer-events:none;"></div>
+    <!-- BG pattern + animated orbs + particle canvas -->
+    <div class="hero-orb" style="position:absolute;width:55%;height:55%;border-radius:50%;background:radial-gradient(circle,rgba(14,165,233,0.22),transparent 70%);top:-5%;left:-5%;pointer-events:none;filter:blur(2px);"></div>
+    <div class="hero-orb2" style="position:absolute;width:50%;height:50%;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.18),transparent 70%);bottom:-10%;right:-5%;pointer-events:none;filter:blur(2px);"></div>
+    <canvas id="hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.7;"></canvas>
     <!-- Logo -->
     <div class="slide-1-logo" style="width:90px;height:90px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;backdrop-filter:blur(8px);">
       <svg class="slide-1-logo-svg" width="56" height="56" viewBox="0 0 100 100" fill="none">
@@ -1431,15 +1454,18 @@ function goToSlide(n) {
   if (!next) return;
   const dir = n > current ? 1 : -1;
   prev.classList.remove('active');
-  prev.style.transform = 'translateX(' + (-dir * 60) + 'px)';
+  prev.style.transform = 'translateX(' + (-dir * 90) + 'px) scale(0.95)';
+  prev.style.filter = 'blur(5px)';
   prev.style.opacity = '0';
-  setTimeout(() => { prev.style.transform = ''; prev.style.opacity = ''; }, 400);
-  next.style.transform = 'translateX(' + (dir * 60) + 'px)';
+  setTimeout(() => { prev.style.transform=''; prev.style.opacity=''; prev.style.filter=''; prev.style.transition=''; }, 600);
+  next.style.transform = 'translateX(' + (dir * 90) + 'px) scale(0.95)';
+  next.style.filter = 'blur(5px)';
   next.style.opacity = '0';
   next.classList.add('active');
   requestAnimationFrame(() => {
-    next.style.transition = 'opacity 0.4s, transform 0.4s cubic-bezier(0.4,0,0.2,1)';
-    next.style.transform = 'translateX(0)';
+    next.style.transition = 'opacity 0.55s cubic-bezier(0.16,1,0.3,1), transform 0.55s cubic-bezier(0.16,1,0.3,1), filter 0.55s';
+    next.style.transform = 'translateX(0) scale(1)';
+    next.style.filter = 'blur(0)';
     next.style.opacity = '1';
   });
   current = n;
@@ -1841,6 +1867,11 @@ document.addEventListener('keydown', function(e) {
     closeModal();
   }
 });
+
+// ═══ Particles (3 lines) ═══
+const _cv=document.getElementById('hero-canvas'),_gx=_cv.getContext('2d'),_ps=Array.from({length:75},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.8+.4,vx:(Math.random()-.5)*.00025,vy:(Math.random()-.5)*.00025,a:Math.random()*.45+.1,c:Math.random()>.6?'99,102,241':'14,165,233'}));
+function _tick(){_cv.width=_cv.offsetWidth;_cv.height=_cv.offsetHeight;_gx.clearRect(0,0,_cv.width,_cv.height);_ps.forEach(p=>{p.x=(p.x+p.vx+1)%1;p.y=(p.y+p.vy+1)%1;_gx.beginPath();_gx.arc(p.x*_cv.width,p.y*_cv.height,p.r,0,6.283);_gx.fillStyle=`rgba(${p.c},${p.a})`;_gx.fill()});requestAnimationFrame(_tick)}
+_tick();
 </script>
 <!-- INFO MODAL -->
 <div class="modal-overlay" id="infoModal" onclick="closeModal()">
